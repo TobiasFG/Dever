@@ -36,5 +36,7 @@ Built with **[Tauri v2](https://v2.tauri.app/)** (Rust backend + the OS's native
 
 ## Project layout
 
-- `src/` — React frontend (`App.tsx`, `components/`, `data/`, `theme/`, `styles.css`)
+- `src-ui/` — React frontend (`App.tsx`, `features/`, `components/`, `lib/`, `theme/`, `styles.css`)
 - `src-tauri/` — Rust backend, Tauri config, and native commands
+
+See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the feature-sliced structure and conventions.
