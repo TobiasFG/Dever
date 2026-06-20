@@ -27,12 +27,12 @@ Built with **[Tauri v2](https://v2.tauri.app/)** (Rust backend + the OS's native
 
 ## Scripts
 
-| Command | What it does |
-| --- | --- |
-| `bun run desktop` | Launch the native desktop app (Tauri dev) |
+| Command                 | What it does                                                                    |
+| ----------------------- | ------------------------------------------------------------------------------- |
+| `bun run desktop`       | Launch the native desktop app (Tauri dev)                                       |
 | `bun run desktop:build` | Build a distributable native bundle (`.app`/`.dmg`, `.deb`/`.AppImage`, `.msi`) |
-| `bun run dev` | Run the frontend only in a browser at http://localhost:1420 |
-| `bun run build` | Type-check and build the frontend |
+| `bun run dev`           | Run the frontend only in a browser at http://localhost:1420                     |
+| `bun run build`         | Type-check and build the frontend                                               |
 
 ## Project layout
 
@@ -40,3 +40,7 @@ Built with **[Tauri v2](https://v2.tauri.app/)** (Rust backend + the OS's native
 - `src-tauri/` — Rust backend, Tauri config, and native commands
 
 See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the feature-sliced structure and conventions.
+
+## Contributing
+
+See [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) for the workflow, conventions, and the quality gate.
