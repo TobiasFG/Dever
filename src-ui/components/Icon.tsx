@@ -21,7 +21,10 @@ export type IconName =
   | 'plus'
   | 'gridSmall'
   | 'atom'
-  | 'download';
+  | 'download'
+  | 'open'
+  | 'more'
+  | 'swap';
 
 type IconProps = {
   name: IconName;
@@ -160,6 +163,28 @@ const paths: Record<IconName, ReactNode> = {
       <path d="M12 4v11" />
       <path d="M7 11l5 5 5-5" />
       <path d="M5 20h14" />
+    </>
+  ),
+  open: (
+    <>
+      <path d="M14 4h6v6" />
+      <path d="M20 4l-9 9" />
+      <path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" />
+    </>
+  ),
+  more: (
+    <>
+      <circle cx="5" cy="12" r="1.4" />
+      <circle cx="12" cy="12" r="1.4" />
+      <circle cx="19" cy="12" r="1.4" />
+    </>
+  ),
+  swap: (
+    <>
+      <path d="M7 4L3 8l4 4" />
+      <path d="M3 8h13" />
+      <path d="M17 20l4-4-4-4" />
+      <path d="M21 16H8" />
     </>
   ),
 };

@@ -1,5 +1,11 @@
+import { useState } from 'react';
 import { Icon } from '@/components/Icon';
+import { Menu, MenuItem } from '@/components/Menu';
+import { Popover } from '@/components/Popover';
+import { openInEditor, openTerminal, revealInFileManager } from '../api';
 import type { RepoView } from '../derive';
+import type { Editor } from '../types';
+import { BranchCombobox, BranchPanel } from './BranchCombobox';
 
 function StatusBadge({ repo }: { repo: RepoView }) {
   return (
@@ -54,7 +60,97 @@ function StatusBadge({ repo }: { repo: RepoView }) {
   );
 }
 
-function RepoRow({ repo }: { repo: RepoView }) {
+/** Card dropdown listing the editors detected on this machine. */
+function EditorMenu({ repo, editors }: { repo: RepoView; editors: Editor[] }) {
+  return (
+    <Popover
+      trigger={({ open, toggle }) => (
+        <button
+          type="button"
+          className="icon-btn"
+          title="Open in editor"
+          aria-expanded={open}
+          onClick={toggle}
+        >
+          <Icon name="editor" size={14} strokeWidth={1.8} />
+        </button>
+      )}
+    >
+      {(close) =>
+        editors.length === 0 ? (
+          <div className="menu">
+            <div className="menu-empty">No editors found</div>
+          </div>
+        ) : (
+          <Menu
+            close={close}
+            items={editors.map((e) => ({
+              icon: 'editor',
+              label: e.name,
+              onSelect: () => void openInEditor(repo.path, e.id),
+            }))}
+          />
+        )
+      }
+    </Popover>
+  );
+}
+
+/** "More actions" dropdown — every action, with icon + text. Selecting Switch
+ * branch swaps the panel to the branch combobox in place. */
+function MoreActionsPanel({
+  repo,
+  editors,
+  close,
+  onSwitched,
+}: {
+  repo: RepoView;
+  editors: Editor[];
+  close: () => void;
+  onSwitched: () => void;
+}) {
+  const [view, setView] = useState<'menu' | 'branch'>('menu');
+  if (view === 'branch') {
+    return <BranchPanel repo={repo} close={close} onSwitched={onSwitched} />;
+  }
+  const items: MenuItem[] = [
+    { icon: 'open', label: 'Open', onSelect: () => {} },
+    {
+      icon: 'swap',
+      label: 'Switch branch',
+      disabled: repo.changes > 0,
+      keepOpen: true,
+      onSelect: () => setView('branch'),
+    },
+    { icon: 'terminal', label: 'Start terminal', onSelect: () => void openTerminal(repo.path) },
+    ...editors.map<MenuItem>((e) => ({
+      icon: 'editor',
+      label: `Open in ${e.name}`,
+      onSelect: () => void openInEditor(repo.path, e.id),
+    })),
+    {
+      icon: 'file',
+      label: 'Reveal in Finder',
+      onSelect: () => void revealInFileManager(repo.path),
+    },
+    {
+      icon: 'docs',
+      label: 'Copy path',
+      onSelect: () => void navigator.clipboard.writeText(repo.path),
+    },
+  ];
+  return <Menu items={items} close={close} />;
+}
+
+function RepoRow({
+  repo,
+  editors,
+  onSwitched,
+}: {
+  repo: RepoView;
+  editors: Editor[];
+  onSwitched: () => void;
+}) {
   return (
     <div className="repo-row">
       <span className="dot" style={{ background: repo.dotColor }} />
@@ -71,12 +167,36 @@ function RepoRow({ repo }: { repo: RepoView }) {
       <div className="spacer" />
 
       <div className="repo-actions">
-        <button className="icon-btn" title="Open in editor">
-          <Icon name="editor" size={14} strokeWidth={1.8} />
+        <button className="icon-btn" title="Open">
+          <Icon name="open" size={14} strokeWidth={1.8} />
         </button>
-        <button className="icon-btn" title="Open terminal">
+        <BranchCombobox repo={repo} onSwitched={onSwitched} />
+        <button
+          type="button"
+          className="icon-btn"
+          title="Start terminal"
+          onClick={() => void openTerminal(repo.path)}
+        >
           <Icon name="terminal" size={14} strokeWidth={1.8} />
         </button>
+        <EditorMenu repo={repo} editors={editors} />
+        <Popover
+          trigger={({ open, toggle }) => (
+            <button
+              type="button"
+              className="icon-btn"
+              title="More actions"
+              aria-expanded={open}
+              onClick={toggle}
+            >
+              <Icon name="more" size={14} strokeWidth={1.8} />
+            </button>
+          )}
+        >
+          {(close) => (
+            <MoreActionsPanel repo={repo} editors={editors} close={close} onSwitched={onSwitched} />
+          )}
+        </Popover>
       </div>
     </div>
   );
@@ -84,12 +204,14 @@ function RepoRow({ repo }: { repo: RepoView }) {
 
 export function RepoList({
   repos,
+  editors,
   query,
   loading,
   onAddRoot,
   onRescan,
 }: {
   repos: RepoView[];
+  editors: Editor[];
   query: string;
   loading: boolean;
   onAddRoot: () => void;
@@ -117,7 +239,7 @@ export function RepoList({
       {repos.length > 0 ? (
         <div className="repo-list">
           {repos.map((repo) => (
-            <RepoRow key={repo.path} repo={repo} />
+            <RepoRow key={repo.path} repo={repo} editors={editors} onSwitched={onRescan} />
           ))}
         </div>
       ) : (

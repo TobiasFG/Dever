@@ -13,7 +13,7 @@ export default function App() {
   const [query, setQuery] = useState('');
   const [mcp, setMcp] = useState(initialMcp);
 
-  const { repos, roots, loading, error, refresh, addRoot } = useRepos();
+  const { repos, roots, editors, loading, error, refresh, addRoot } = useRepos();
 
   const views = useMemo(() => {
     const q = query.toLowerCase().trim();
@@ -65,6 +65,7 @@ export default function App() {
             <div className="columns">
               <RepoList
                 repos={views}
+                editors={editors}
                 query={query}
                 loading={loading}
                 onAddRoot={addRoot}

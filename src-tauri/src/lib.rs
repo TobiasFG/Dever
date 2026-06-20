@@ -2,7 +2,10 @@ mod config;
 mod error;
 mod features;
 
-use features::repos::commands::{add_scan_root, list_scan_roots, remove_scan_root, scan_repos};
+use features::repos::commands::{
+    add_scan_root, list_branches, list_editors, list_scan_roots, open_in_editor, open_terminal,
+    remove_scan_root, reveal_in_file_manager, scan_repos, switch_branch,
+};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -22,7 +25,13 @@ pub fn run() {
             list_scan_roots,
             add_scan_root,
             remove_scan_root,
-            scan_repos
+            scan_repos,
+            list_branches,
+            switch_branch,
+            list_editors,
+            open_in_editor,
+            open_terminal,
+            reveal_in_file_manager
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
