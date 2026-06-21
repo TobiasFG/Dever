@@ -2,6 +2,10 @@ mod config;
 mod error;
 mod features;
 
+use features::claude::commands::{
+    claude_status, read_global_claude_md, set_mcp_enabled, set_plugin_enabled,
+    write_global_claude_md,
+};
 use features::repos::commands::{
     add_scan_root, list_branches, list_editors, list_scan_roots, open_in_editor, open_terminal,
     remove_scan_root, reveal_in_file_manager, scan_repos, switch_branch,
@@ -31,7 +35,12 @@ pub fn run() {
             list_editors,
             open_in_editor,
             open_terminal,
-            reveal_in_file_manager
+            reveal_in_file_manager,
+            claude_status,
+            read_global_claude_md,
+            write_global_claude_md,
+            set_mcp_enabled,
+            set_plugin_enabled
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

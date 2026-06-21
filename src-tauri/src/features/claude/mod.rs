@@ -1,0 +1,8 @@
+pub mod claude_md;
+pub mod commands;
+pub mod detect;
+pub mod mcp;
+pub mod model;
+pub mod paths;
+pub mod plugins;
+pub mod settings;

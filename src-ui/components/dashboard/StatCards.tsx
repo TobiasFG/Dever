@@ -29,12 +29,14 @@ export function StatCards({
   repoCount,
   dirtyCount,
   behindCount,
+  detected,
   activeMcp,
   mcpTotal,
 }: {
   repoCount: number;
   dirtyCount: number;
   behindCount: number;
+  detected: boolean;
   activeMcp: number;
   mcpTotal: number;
 }) {
@@ -55,10 +57,10 @@ export function StatCards({
       />
       <StatCard
         label="MCP servers"
-        value={activeMcp}
-        valueColor="var(--green)"
-        suffix={<span className="suffix">/{mcpTotal}</span>}
-        sub="active globally"
+        value={detected ? activeMcp : '—'}
+        valueColor={detected ? 'var(--green)' : 'var(--text-faint)'}
+        suffix={detected ? <span className="suffix">/{mcpTotal}</span> : undefined}
+        sub={detected ? 'active globally' : 'Claude Code offline'}
       />
     </div>
   );

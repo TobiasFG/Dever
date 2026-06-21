@@ -24,7 +24,8 @@ export type IconName =
   | 'download'
   | 'open'
   | 'more'
-  | 'swap';
+  | 'swap'
+  | 'close';
 
 type IconProps = {
   name: IconName;
@@ -185,6 +186,12 @@ const paths: Record<IconName, ReactNode> = {
       <path d="M3 8h13" />
       <path d="M17 20l4-4-4-4" />
       <path d="M21 16H8" />
+    </>
+  ),
+  close: (
+    <>
+      <path d="M6 6l12 12" />
+      <path d="M18 6L6 18" />
     </>
   ),
 };
