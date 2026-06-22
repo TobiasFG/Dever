@@ -25,6 +25,7 @@ export type IconName =
   | 'open'
   | 'more'
   | 'swap'
+  | 'grip'
   | 'close';
 
 type IconProps = {
@@ -192,6 +193,16 @@ const paths: Record<IconName, ReactNode> = {
     <>
       <path d="M6 6l12 12" />
       <path d="M18 6L6 18" />
+    </>
+  ),
+  grip: (
+    <>
+      <circle cx="9" cy="6" r="1.3" />
+      <circle cx="15" cy="6" r="1.3" />
+      <circle cx="9" cy="12" r="1.3" />
+      <circle cx="15" cy="12" r="1.3" />
+      <circle cx="9" cy="18" r="1.3" />
+      <circle cx="15" cy="18" r="1.3" />
     </>
   ),
 };

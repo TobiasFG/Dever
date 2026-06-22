@@ -5,6 +5,8 @@ export const listScanRoots = () => call<string[]>('list_scan_roots');
 export const addScanRoot = (path: string) => call<string[]>('add_scan_root', { path });
 export const removeScanRoot = (path: string) => call<string[]>('remove_scan_root', { path });
 export const scanRepos = () => call<Repo[]>('scan_repos');
+export const setRepoOrder = (order: string[]) => call<void>('set_repo_order', { order });
+export const pullRepo = (path: string) => call<Repo>('pull_repo', { path });
 
 export const listBranches = (path: string) => call<Branch[]>('list_branches', { path });
 export const switchBranch = (path: string, name: string, isRemote: boolean) =>

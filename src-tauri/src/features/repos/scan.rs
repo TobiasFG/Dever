@@ -3,13 +3,14 @@ use walkdir::WalkDir;
 
 /// Directory names we never descend into while looking for repos.
 const SKIP_DIRS: &[&str] = &["node_modules", "target", ".git", "dist", "vendor", ".cache"];
-const MAX_DEPTH: usize = 6;
 
-/// Walk `root` and return every git repository found, without descending into a
-/// repo's working tree or into noise directories.
+/// Walk `root` and return every git repository found, at any depth, without
+/// descending into a repo's working tree or into noise directories. There is no
+/// depth cap — pruning noise dirs and stopping at each repo boundary keeps the
+/// walk bounded in practice.
 pub fn discover(root: &Path) -> Vec<PathBuf> {
     let mut repos = Vec::new();
-    let mut walker = WalkDir::new(root).max_depth(MAX_DEPTH).into_iter();
+    let mut walker = WalkDir::new(root).into_iter();
 
     while let Some(entry) = walker.next() {
         let entry = match entry {
@@ -63,5 +64,27 @@ mod tests {
         found.sort();
 
         assert_eq!(found, vec!["a".to_string(), "group/b".to_string()]);
+    }
+
+    #[test]
+    fn finds_repos_nested_beyond_the_old_depth_cap() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = tmp.path();
+
+        // Eight levels deep — past the former MAX_DEPTH of 6.
+        let deep = root.join("a/b/c/d/e/f/g/repo");
+        fs::create_dir_all(deep.join(".git")).unwrap();
+
+        let found: Vec<String> = discover(root)
+            .into_iter()
+            .map(|p| {
+                p.strip_prefix(root)
+                    .unwrap()
+                    .to_string_lossy()
+                    .replace('\\', "/")
+            })
+            .collect();
+
+        assert_eq!(found, vec!["a/b/c/d/e/f/g/repo".to_string()]);
     }
 }

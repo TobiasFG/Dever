@@ -1,0 +1,4 @@
+# Normalize line endings: text files are stored as LF in the repo and checked
+# out as LF on every platform. Prevents Windows clones (with core.autocrlf=true)
+# from turning the tree into CRLF, which breaks the Prettier/format gate.
+* text=auto eol=lf

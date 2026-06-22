@@ -8,7 +8,7 @@ use features::claude::commands::{
 };
 use features::repos::commands::{
     add_scan_root, list_branches, list_editors, list_scan_roots, open_in_editor, open_terminal,
-    remove_scan_root, reveal_in_file_manager, scan_repos, switch_branch,
+    pull_repo, remove_scan_root, reveal_in_file_manager, scan_repos, set_repo_order, switch_branch,
 };
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -30,6 +30,8 @@ pub fn run() {
             add_scan_root,
             remove_scan_root,
             scan_repos,
+            set_repo_order,
+            pull_repo,
             list_branches,
             switch_branch,
             list_editors,

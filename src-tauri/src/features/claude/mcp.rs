@@ -60,7 +60,7 @@ fn list_at(claude_json: &Path, stash: &Path) -> Result<Vec<McpServer>, AppError>
             enabled: false,
         }))
         .collect();
-    servers.sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
+    servers.sort_by_key(|s| s.name.to_lowercase());
     Ok(servers)
 }
 

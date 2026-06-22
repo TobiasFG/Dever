@@ -65,7 +65,7 @@ fn list_at(installed_path: &Path, settings_path: &Path) -> Result<Vec<Plugin>, A
             }
         })
         .collect();
-    result.sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
+    result.sort_by_key(|p| p.name.to_lowercase());
     Ok(result)
 }
 

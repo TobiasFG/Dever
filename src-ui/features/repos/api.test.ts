@@ -9,9 +9,11 @@ import {
   listScanRoots,
   openInEditor,
   openTerminal,
+  pullRepo,
   removeScanRoot,
   revealInFileManager,
   scanRepos,
+  setRepoOrder,
   switchBranch,
 } from './api';
 
@@ -40,6 +42,18 @@ describe('repos api', () => {
     invoke.mockResolvedValue([]);
     await removeScanRoot('/code');
     expect(invoke).toHaveBeenCalledWith('remove_scan_root', { path: '/code' });
+  });
+
+  it('setRepoOrder passes the order array', async () => {
+    invoke.mockResolvedValue(undefined);
+    await setRepoOrder(['/code/b', '/code/a']);
+    expect(invoke).toHaveBeenCalledWith('set_repo_order', { order: ['/code/b', '/code/a'] });
+  });
+
+  it('pullRepo passes the path argument', async () => {
+    invoke.mockResolvedValue(undefined);
+    await pullRepo('/code/app');
+    expect(invoke).toHaveBeenCalledWith('pull_repo', { path: '/code/app' });
   });
 
   it('listBranches passes the path argument', async () => {
