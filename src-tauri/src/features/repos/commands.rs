@@ -52,8 +52,38 @@ pub fn scan_repos(app: AppHandle) -> Result<Vec<Repo>, AppError> {
             .filter_map(|h| h.join().ok().flatten())
             .collect()
     });
-    repos.sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
+
+    let order = config::load_order(&app)?;
+    sort_repos(&mut repos, &order);
     Ok(repos)
+}
+
+/// Order repos by the user's saved arrangement: repos listed in `order` come
+/// first in that order, and anything not listed (newly discovered) follows
+/// alphabetically by name.
+fn sort_repos(repos: &mut [Repo], order: &[String]) {
+    let rank = |path: &str| order.iter().position(|p| p == path);
+    repos.sort_by(|a, b| match (rank(&a.path), rank(&b.path)) {
+        (Some(ia), Some(ib)) => ia.cmp(&ib),
+        (Some(_), None) => std::cmp::Ordering::Less,
+        (None, Some(_)) => std::cmp::Ordering::Greater,
+        (None, None) => a.name.to_lowercase().cmp(&b.name.to_lowercase()),
+    });
+}
+
+/// Persist the user's repo ordering (a list of repo paths) for the dashboard.
+#[tauri::command]
+pub fn set_repo_order(app: AppHandle, order: Vec<String>) -> Result<(), AppError> {
+    config::save_order(&app, &order)
+}
+
+/// Fast-forward-only pull for one repo, returning its refreshed status. Fails
+/// (without changing the repo) when the pull isn't a clean fast-forward.
+#[tauri::command]
+pub fn pull_repo(path: String) -> Result<Repo, AppError> {
+    let repo_path = Path::new(&path);
+    git::pull(repo_path)?;
+    build_repo(repo_path).ok_or_else(|| AppError::new(format!("repo vanished after pull: {path}")))
 }
 
 /// List a repo's local + remote branches for the switch-branch combobox.
@@ -91,6 +121,42 @@ pub fn open_terminal(path: String) -> Result<(), AppError> {
 #[tauri::command]
 pub fn reveal_in_file_manager(path: String) -> Result<(), AppError> {
     fs::reveal(&path)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn repo(name: &str, path: &str) -> Repo {
+        Repo {
+            name: name.to_string(),
+            path: path.to_string(),
+            branch: None,
+            upstream: None,
+            ahead: 0,
+            behind: 0,
+            changes: 0,
+            conflict: false,
+            detached: false,
+        }
+    }
+
+    #[test]
+    fn ordered_repos_lead_then_unlisted_go_alphabetical() {
+        let mut repos = vec![repo("zebra", "/z"), repo("alpha", "/a"), repo("beta", "/b")];
+        // User pinned /b then /z; /a is unlisted.
+        sort_repos(&mut repos, &["/b".to_string(), "/z".to_string()]);
+        let paths: Vec<_> = repos.iter().map(|r| r.path.as_str()).collect();
+        assert_eq!(paths, vec!["/b", "/z", "/a"]);
+    }
+
+    #[test]
+    fn empty_order_is_alphabetical_by_name() {
+        let mut repos = vec![repo("zebra", "/z"), repo("Alpha", "/a")];
+        sort_repos(&mut repos, &[]);
+        let names: Vec<_> = repos.iter().map(|r| r.name.as_str()).collect();
+        assert_eq!(names, vec!["Alpha", "zebra"]);
+    }
 }
 
 fn build_repo(path: &Path) -> Option<Repo> {

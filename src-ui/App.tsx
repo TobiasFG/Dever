@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Sidebar, NavId } from '@/components/dashboard/Sidebar';
 import { TopBar } from '@/components/dashboard/TopBar';
-import { StatCards } from '@/components/dashboard/StatCards';
 import { ClaudePanel } from '@/features/claude/components/ClaudePanel';
 import { useClaude } from '@/features/claude/useClaude';
 import { RepoList } from '@/features/repos/components/RepoList';
@@ -12,7 +11,19 @@ export default function App() {
   const [activeNav, setActiveNav] = useState<NavId>('dashboard');
   const [query, setQuery] = useState('');
 
-  const { repos, roots, editors, loading, error, refresh, addRoot } = useRepos();
+  const {
+    repos,
+    roots,
+    editors,
+    loading,
+    error,
+    refresh,
+    addRoot,
+    removeRoot,
+    reorder,
+    pull,
+    pullAll,
+  } = useRepos();
   const { status: claude, toggleMcp, togglePlugin, saveSystemPrompt } = useClaude();
 
   const views = useMemo(() => {
@@ -27,11 +38,6 @@ export default function App() {
       )
       .map(deriveRepo);
   }, [repos, query]);
-
-  const mcp = claude?.mcp ?? [];
-  const activeMcp = mcp.filter((m) => m.enabled).length;
-  const dirtyCount = repos.filter((r) => r.changes > 0).length;
-  const behindCount = repos.filter((r) => r.behind > 0).length;
 
   return (
     <div className="shell">
@@ -52,23 +58,19 @@ export default function App() {
 
             {error && <div className="empty">Scan failed: {error}</div>}
 
-            <StatCards
-              repoCount={repos.length}
-              dirtyCount={dirtyCount}
-              behindCount={behindCount}
-              detected={claude?.detected ?? false}
-              activeMcp={activeMcp}
-              mcpTotal={mcp.length}
-            />
-
             <div className="columns">
               <RepoList
                 repos={views}
                 editors={editors}
                 query={query}
                 loading={loading}
+                roots={roots}
                 onAddRoot={addRoot}
                 onRescan={refresh}
+                onRemoveRoot={removeRoot}
+                onReorder={reorder}
+                onPull={pull}
+                onPullAll={pullAll}
               />
               <ClaudePanel
                 status={claude}

@@ -5,6 +5,7 @@ import { Popover } from '@/components/Popover';
 import { openInEditor, openTerminal, revealInFileManager } from '../api';
 import type { RepoView } from '../derive';
 import type { Editor } from '../types';
+import type { PullAllResult } from '../useRepos';
 import { BranchCombobox, BranchPanel } from './BranchCombobox';
 
 function StatusBadge({ repo }: { repo: RepoView }) {
@@ -57,6 +58,29 @@ function StatusBadge({ repo }: { repo: RepoView }) {
         </span>
       )}
     </div>
+  );
+}
+
+/** Fast-forward pull button — shown only when the repo is a safe ff candidate. */
+function PullButton({ repo, onPull }: { repo: RepoView; onPull: (path: string) => Promise<void> }) {
+  const [busy, setBusy] = useState(false);
+  return (
+    <button
+      type="button"
+      className="icon-btn pull-btn"
+      title={`Pull ${repo.behind} commit${repo.behind === 1 ? '' : 's'} (fast-forward)`}
+      disabled={busy}
+      onClick={async () => {
+        setBusy(true);
+        try {
+          await onPull(repo.path);
+        } finally {
+          setBusy(false);
+        }
+      }}
+    >
+      <Icon name="download" size={14} strokeWidth={1.8} />
+    </button>
   );
 }
 
@@ -142,17 +166,51 @@ function MoreActionsPanel({
   return <Menu items={items} close={close} />;
 }
 
+type DragState = {
+  draggable: boolean;
+  dragging: boolean;
+  dropEdge: 'before' | 'after' | null;
+  onDragStart: () => void;
+  onDragOver: (e: React.DragEvent) => void;
+  onDrop: (e: React.DragEvent) => void;
+  onDragEnd: () => void;
+};
+
 function RepoRow({
   repo,
   editors,
   onSwitched,
+  onPull,
+  drag,
 }: {
   repo: RepoView;
   editors: Editor[];
   onSwitched: () => void;
+  onPull: (path: string) => Promise<void>;
+  drag: DragState;
 }) {
+  const className = [
+    'repo-row',
+    drag.dragging ? 'dragging' : '',
+    drag.dropEdge ? `drop-${drag.dropEdge}` : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
   return (
-    <div className="repo-row">
+    <div
+      className={className}
+      draggable={drag.draggable}
+      onDragStart={drag.onDragStart}
+      onDragOver={drag.onDragOver}
+      onDrop={drag.onDrop}
+      onDragEnd={drag.onDragEnd}
+    >
+      {drag.draggable && (
+        <span className="drag-handle" title="Drag to reorder" aria-hidden>
+          <Icon name="grip" size={14} strokeWidth={1.8} />
+        </span>
+      )}
       <span className="dot" style={{ background: repo.dotColor }} />
       <span className="repo-name">{repo.name}</span>
       <span className="repo-path">{repo.path}</span>
@@ -167,6 +225,7 @@ function RepoRow({
       <div className="spacer" />
 
       <div className="repo-actions">
+        {repo.canPull && <PullButton repo={repo} onPull={onPull} />}
         <button className="icon-btn" title="Open">
           <Icon name="open" size={14} strokeWidth={1.8} />
         </button>
@@ -202,21 +261,136 @@ function RepoRow({
   );
 }
 
+/** Dropdown listing the scanned root folders, each removable. */
+function ManageFoldersPanel({
+  roots,
+  onAddRoot,
+  onRemoveRoot,
+}: {
+  roots: string[];
+  onAddRoot: () => void;
+  onRemoveRoot: (path: string) => void;
+}) {
+  return (
+    <div className="menu folders-menu">
+      <div className="menu-section">Scanned folders</div>
+      {roots.length === 0 ? (
+        <div className="menu-empty">No folders added yet.</div>
+      ) : (
+        roots.map((root) => (
+          <div className="folder-row" key={root}>
+            <span className="folder-path" title={root}>
+              {root}
+            </span>
+            <button
+              type="button"
+              className="icon-btn"
+              title="Stop scanning this folder"
+              onClick={() => onRemoveRoot(root)}
+            >
+              <Icon name="close" size={13} strokeWidth={2} />
+            </button>
+          </div>
+        ))
+      )}
+      <button type="button" className="menu-item" onClick={onAddRoot}>
+        <Icon name="plus" size={14} strokeWidth={1.8} />
+        Add folder…
+      </button>
+    </div>
+  );
+}
+
 export function RepoList({
   repos,
   editors,
   query,
   loading,
+  roots,
   onAddRoot,
   onRescan,
+  onRemoveRoot,
+  onReorder,
+  onPull,
+  onPullAll,
 }: {
   repos: RepoView[];
   editors: Editor[];
   query: string;
   loading: boolean;
+  roots: string[];
   onAddRoot: () => void;
   onRescan: () => void;
+  onRemoveRoot: (path: string) => void;
+  onReorder: (orderedPaths: string[]) => void;
+  onPull: (path: string) => Promise<void>;
+  onPullAll: (paths: string[]) => Promise<PullAllResult>;
 }) {
+  const [dragPath, setDragPath] = useState<string | null>(null);
+  const [dropTarget, setDropTarget] = useState<{ path: string; below: boolean } | null>(null);
+  const [bulkPulling, setBulkPulling] = useState(false);
+
+  // Reordering only makes sense over the full, unfiltered list.
+  const dndEnabled = query.trim() === '';
+  const pullable = repos.filter((r) => r.canPull).map((r) => r.path);
+
+  const resetDrag = () => {
+    setDragPath(null);
+    setDropTarget(null);
+  };
+
+  const commitDrop = () => {
+    if (!dragPath || !dropTarget) return resetDrag();
+    const paths = repos.map((r) => r.path);
+    const from = paths.indexOf(dragPath);
+    if (from < 0) return resetDrag();
+    paths.splice(from, 1);
+    let insert = paths.indexOf(dropTarget.path);
+    if (insert < 0) return resetDrag();
+    if (dropTarget.below) insert += 1;
+    paths.splice(insert, 0, dragPath);
+    onReorder(paths);
+    resetDrag();
+  };
+
+  const dragFor = (repo: RepoView): DragState => {
+    const dropEdge: 'before' | 'after' | null =
+      dropTarget?.path === repo.path && dragPath && dragPath !== repo.path
+        ? dropTarget.below
+          ? 'after'
+          : 'before'
+        : null;
+    return {
+      draggable: dndEnabled,
+      dragging: dragPath === repo.path,
+      dropEdge,
+      onDragStart: () => setDragPath(repo.path),
+      onDragOver: (e) => {
+        if (!dragPath || dragPath === repo.path) return;
+        e.preventDefault();
+        const rect = e.currentTarget.getBoundingClientRect();
+        const below = e.clientY - rect.top > rect.height / 2;
+        setDropTarget((prev) =>
+          prev?.path === repo.path && prev.below === below ? prev : { path: repo.path, below },
+        );
+      },
+      onDrop: (e) => {
+        e.preventDefault();
+        commitDrop();
+      },
+      onDragEnd: resetDrag,
+    };
+  };
+
+  const pullAllEligible = async () => {
+    setBulkPulling(true);
+    try {
+      await onPullAll(pullable);
+    } finally {
+      setBulkPulling(false);
+    }
+  };
+
   return (
     <section className="repos">
       <div className="section-head">
@@ -225,10 +399,33 @@ export function RepoList({
           <span className="count-pill">{repos.length}</span>
         </h2>
         <div className="filter-row">
-          <button className="btn-secondary" onClick={onAddRoot} disabled={loading}>
-            <Icon name="file" size={14} strokeWidth={1.8} />
-            Add folder
-          </button>
+          {pullable.length > 0 && (
+            <button
+              className="btn-secondary"
+              onClick={pullAllEligible}
+              disabled={loading || bulkPulling}
+            >
+              <Icon name="download" size={14} strokeWidth={1.8} />
+              {bulkPulling ? 'Pulling…' : `Pull ${pullable.length} behind`}
+            </button>
+          )}
+          <Popover
+            trigger={({ open, toggle }) => (
+              <button
+                className="btn-secondary"
+                aria-expanded={open}
+                onClick={toggle}
+                disabled={loading}
+              >
+                <Icon name="file" size={14} strokeWidth={1.8} />
+                Manage folders
+              </button>
+            )}
+          >
+            {() => (
+              <ManageFoldersPanel roots={roots} onAddRoot={onAddRoot} onRemoveRoot={onRemoveRoot} />
+            )}
+          </Popover>
           <button className="btn-secondary" onClick={onRescan} disabled={loading}>
             <Icon name="rescan" size={14} strokeWidth={1.8} />
             {loading ? 'Scanning…' : 'Rescan'}
@@ -239,7 +436,14 @@ export function RepoList({
       {repos.length > 0 ? (
         <div className="repo-list">
           {repos.map((repo) => (
-            <RepoRow key={repo.path} repo={repo} editors={editors} onSwitched={onRescan} />
+            <RepoRow
+              key={repo.path}
+              repo={repo}
+              editors={editors}
+              onSwitched={onRescan}
+              onPull={onPull}
+              drag={dragFor(repo)}
+            />
           ))}
         </div>
       ) : (

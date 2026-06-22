@@ -35,6 +35,29 @@ pub fn status(path: &Path) -> Result<ParsedStatus, AppError> {
     Ok(parse_porcelain_v2(&String::from_utf8_lossy(&output.stdout)))
 }
 
+/// Fast-forward-only pull. `--ff-only` refuses to create a merge commit, so a
+/// repo that has diverged (local commits the remote lacks) fails cleanly rather
+/// than producing a merge or conflicts — exactly the safe behaviour we want for
+/// bulk "pull everything that's behind".
+pub fn pull(path: &Path) -> Result<(), AppError> {
+    let output = Command::new("git")
+        .arg("-C")
+        .arg(path)
+        .args(["pull", "--ff-only"])
+        .output()?;
+
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        return Err(AppError::new(format!(
+            "git pull failed in {}: {}",
+            path.display(),
+            stderr.trim()
+        )));
+    }
+
+    Ok(())
+}
+
 /// Pure parser for porcelain v2 output. See `git status` docs for the format:
 /// header lines start with `# branch.*`; entry lines start with `1`/`2` (changed),
 /// `u` (unmerged), or `?` (untracked).

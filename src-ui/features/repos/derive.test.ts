@@ -47,4 +47,15 @@ describe('deriveRepo', () => {
     const v = deriveRepo({ ...base, branch: null, detached: true });
     expect(v.branch).toBe('detached');
   });
+
+  it('can pull when behind with a clean fast-forward', () => {
+    expect(deriveRepo({ ...base, behind: 2 }).canPull).toBe(true);
+  });
+
+  it('cannot pull when diverged, dirty, or conflicted', () => {
+    expect(deriveRepo({ ...base, behind: 2, ahead: 1 }).canPull).toBe(false);
+    expect(deriveRepo({ ...base, behind: 2, changes: 1 }).canPull).toBe(false);
+    expect(deriveRepo({ ...base, behind: 2, conflict: true }).canPull).toBe(false);
+    expect(deriveRepo({ ...base, behind: 0 }).canPull).toBe(false);
+  });
 });

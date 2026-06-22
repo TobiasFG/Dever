@@ -1,7 +1,18 @@
 import { useCallback, useEffect, useState } from 'react';
 import { open } from '@tauri-apps/plugin-dialog';
-import { addScanRoot, listEditors, listScanRoots, scanRepos } from './api';
+import {
+  addScanRoot,
+  listEditors,
+  listScanRoots,
+  pullRepo,
+  removeScanRoot,
+  scanRepos,
+  setRepoOrder,
+} from './api';
 import type { Editor, Repo } from './types';
+
+/** Outcome of a bulk pull: how many repos fast-forwarded and how many failed. */
+export type PullAllResult = { pulled: number; failed: number };
 
 export function useRepos() {
   const [repos, setRepos] = useState<Repo[]>([]);
@@ -43,6 +54,53 @@ export function useRepos() {
     }
   }, []);
 
+  const removeRoot = useCallback(async (path: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      setRoots(await removeScanRoot(path));
+      setRepos(await scanRepos());
+    } catch (e) {
+      setError(String(e));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Apply a new ordering (a list of repo paths) optimistically and persist it.
+  const reorder = useCallback((orderedPaths: string[]) => {
+    setRepos((prev) => {
+      const byPath = new Map(prev.map((r) => [r.path, r]));
+      const next = orderedPaths.map((p) => byPath.get(p)).filter((r): r is Repo => r !== undefined);
+      return next.length === prev.length ? next : prev;
+    });
+    void setRepoOrder(orderedPaths).catch((e) => setError(String(e)));
+  }, []);
+
+  const pull = useCallback(async (path: string) => {
+    const updated = await pullRepo(path);
+    setRepos((prev) => prev.map((r) => (r.path === path ? updated : r)));
+  }, []);
+
+  // Pull a set of repos sequentially, swallowing per-repo failures (e.g. a
+  // pull that isn't a clean fast-forward) and reporting a tally.
+  const pullAll = useCallback(
+    async (paths: string[]): Promise<PullAllResult> => {
+      let pulled = 0;
+      let failed = 0;
+      for (const path of paths) {
+        try {
+          await pull(path);
+          pulled += 1;
+        } catch {
+          failed += 1;
+        }
+      }
+      return { pulled, failed };
+    },
+    [pull],
+  );
+
   useEffect(() => {
     void (async () => {
       await refresh();
@@ -51,5 +109,17 @@ export function useRepos() {
     })();
   }, [refresh]);
 
-  return { repos, roots, editors, loading, error, refresh, addRoot };
+  return {
+    repos,
+    roots,
+    editors,
+    loading,
+    error,
+    refresh,
+    addRoot,
+    removeRoot,
+    reorder,
+    pull,
+    pullAll,
+  };
 }
