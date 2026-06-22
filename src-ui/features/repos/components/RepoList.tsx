@@ -170,7 +170,7 @@ type DragState = {
   draggable: boolean;
   dragging: boolean;
   dropEdge: 'before' | 'after' | null;
-  onDragStart: () => void;
+  onDragStart: (e: React.DragEvent) => void;
   onDragOver: (e: React.DragEvent) => void;
   onDrop: (e: React.DragEvent) => void;
   onDragEnd: () => void;
@@ -364,10 +364,17 @@ export function RepoList({
       draggable: dndEnabled,
       dragging: dragPath === repo.path,
       dropEdge,
-      onDragStart: () => setDragPath(repo.path),
+      onDragStart: (e) => {
+        // Without an allowed effect + payload, WebView2/WebKitGTK reject every
+        // drop target (the "not allowed" cursor) and never fire dragover state.
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', repo.path);
+        setDragPath(repo.path);
+      },
       onDragOver: (e) => {
         if (!dragPath || dragPath === repo.path) return;
         e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
         const rect = e.currentTarget.getBoundingClientRect();
         const below = e.clientY - rect.top > rect.height / 2;
         setDropTarget((prev) =>
