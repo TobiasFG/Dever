@@ -6,6 +6,7 @@ use features::claude::commands::{
     claude_status, read_global_claude_md, set_mcp_enabled, set_plugin_enabled,
     write_global_claude_md,
 };
+use features::docs::commands::{list_docs, read_doc};
 use features::repos::commands::{
     add_scan_root, list_branches, list_editors, list_scan_roots, open_in_editor, open_terminal,
     pull_repo, remove_scan_root, reveal_in_file_manager, scan_repos, set_repo_order, switch_branch,
@@ -42,7 +43,9 @@ pub fn run() {
             read_global_claude_md,
             write_global_claude_md,
             set_mcp_enabled,
-            set_plugin_enabled
+            set_plugin_enabled,
+            list_docs,
+            read_doc
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
