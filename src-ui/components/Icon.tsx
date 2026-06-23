@@ -14,6 +14,9 @@ export type IconName =
   | 'check'
   | 'chevronUp'
   | 'chevronDown'
+  | 'chevronRight'
+  | 'back'
+  | 'folder'
   | 'conflict'
   | 'editor'
   | 'terminal'
@@ -112,6 +115,11 @@ const paths: Record<IconName, ReactNode> = {
   check: <path d="M5 12.5l4.5 4.5L19 7.5" />,
   chevronUp: <path d="M6 14l6-6 6 6" />,
   chevronDown: <path d="M6 10l6 6 6-6" />,
+  chevronRight: <path d="M9 6l6 6-6 6" />,
+  back: <path d="M15 5l-7 7 7 7" />,
+  folder: (
+    <path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h4l2 2.2H19.5A1.5 1.5 0 0 1 21 9.7v8.8A1.5 1.5 0 0 1 19.5 20h-15A1.5 1.5 0 0 1 3 18.5z" />
+  ),
   conflict: (
     <>
       <path d="M12 3.8L21 20H3z" />

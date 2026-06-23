@@ -181,12 +181,14 @@ function RepoRow({
   editors,
   onSwitched,
   onPull,
+  onOpen,
   drag,
 }: {
   repo: RepoView;
   editors: Editor[];
   onSwitched: () => void;
   onPull: (path: string) => Promise<void>;
+  onOpen: (path: string) => void;
   drag: DragState;
 }) {
   const className = [
@@ -200,14 +202,21 @@ function RepoRow({
   return (
     <div
       className={className}
+      title="Open repository"
       draggable={drag.draggable}
+      onClick={() => onOpen(repo.path)}
       onDragStart={drag.onDragStart}
       onDragOver={drag.onDragOver}
       onDrop={drag.onDrop}
       onDragEnd={drag.onDragEnd}
     >
       {drag.draggable && (
-        <span className="drag-handle" title="Drag to reorder" aria-hidden>
+        <span
+          className="drag-handle"
+          title="Drag to reorder"
+          aria-hidden
+          onClick={(e) => e.stopPropagation()}
+        >
           <Icon name="grip" size={14} strokeWidth={1.8} />
         </span>
       )}
@@ -224,9 +233,9 @@ function RepoRow({
 
       <div className="spacer" />
 
-      <div className="repo-actions">
+      <div className="repo-actions" onClick={(e) => e.stopPropagation()}>
         {repo.canPull && <PullButton repo={repo} onPull={onPull} />}
-        <button className="icon-btn" title="Open">
+        <button className="icon-btn" title="Open" onClick={() => onOpen(repo.path)}>
           <Icon name="open" size={14} strokeWidth={1.8} />
         </button>
         <BranchCombobox repo={repo} onSwitched={onSwitched} />
@@ -313,6 +322,7 @@ export function RepoList({
   onReorder,
   onPull,
   onPullAll,
+  onOpen,
 }: {
   repos: RepoView[];
   editors: Editor[];
@@ -325,6 +335,7 @@ export function RepoList({
   onReorder: (orderedPaths: string[]) => void;
   onPull: (path: string) => Promise<void>;
   onPullAll: (paths: string[]) => Promise<PullAllResult>;
+  onOpen: (path: string) => void;
 }) {
   const [dragPath, setDragPath] = useState<string | null>(null);
   const [dropTarget, setDropTarget] = useState<{ path: string; below: boolean } | null>(null);
@@ -449,6 +460,7 @@ export function RepoList({
               editors={editors}
               onSwitched={onRescan}
               onPull={onPull}
+              onOpen={onOpen}
               drag={dragFor(repo)}
             />
           ))}

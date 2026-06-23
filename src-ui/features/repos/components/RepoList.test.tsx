@@ -45,6 +45,7 @@ describe('repo list drag-and-drop', () => {
         onReorder={onReorder}
         onPull={async () => {}}
         onPullAll={async () => ({ pulled: 0, failed: 0 })}
+        onOpen={() => {}}
       />,
     );
 
