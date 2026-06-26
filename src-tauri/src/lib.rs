@@ -3,8 +3,8 @@ mod error;
 mod features;
 
 use features::claude::commands::{
-    claude_status, read_global_claude_md, set_mcp_enabled, set_plugin_enabled,
-    write_global_claude_md,
+    claude_status, read_global_claude_md, repo_claude, set_mcp_enabled, set_plugin_enabled,
+    set_repo_mcp_enabled, set_repo_plugin_enabled, write_global_claude_md,
 };
 use features::docs::commands::{list_docs, read_doc};
 use features::repos::commands::{
@@ -44,6 +44,9 @@ pub fn run() {
             write_global_claude_md,
             set_mcp_enabled,
             set_plugin_enabled,
+            repo_claude,
+            set_repo_mcp_enabled,
+            set_repo_plugin_enabled,
             list_docs,
             read_doc
         ])

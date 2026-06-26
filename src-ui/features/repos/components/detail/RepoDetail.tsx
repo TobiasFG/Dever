@@ -19,8 +19,6 @@ export function RepoDetail({
   onBack,
   onSelectSection,
   onPull,
-  onToggleMcp,
-  onTogglePlugin,
 }: {
   repo: Repo;
   section: RepoSection;
@@ -29,8 +27,6 @@ export function RepoDetail({
   onBack: () => void;
   onSelectSection: (s: RepoSection) => void;
   onPull: (path: string) => Promise<void>;
-  onToggleMcp: (name: string, enabled: boolean) => void;
-  onTogglePlugin: (key: string, enabled: boolean) => void;
 }) {
   const detail = deriveDetail(repo);
 
@@ -148,14 +144,7 @@ export function RepoDetail({
           />
         )}
         {section === 'branches' && <BranchesSection repo={repo} />}
-        {section === 'claude' && (
-          <ClaudeSection
-            repo={repo}
-            claude={claude}
-            onToggleMcp={onToggleMcp}
-            onTogglePlugin={onTogglePlugin}
-          />
-        )}
+        {section === 'claude' && <ClaudeSection repo={repo} claude={claude} />}
         {section === 'docs' && (
           <DocsViewer repoPath={repo.path} onOpen={editors.length > 0 ? openFile : undefined} />
         )}
