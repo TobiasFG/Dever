@@ -1,5 +1,8 @@
 use crate::error::AppError;
-use crate::features::claude::{claude_md, detect, mcp, model::ClaudeStatus, plugins};
+use crate::features::claude::{
+    claude_md, detect, mcp, model::ClaudeStatus, model::RepoClaude, plugins,
+};
+use std::path::Path;
 use tauri::AppHandle;
 
 /// One batched read of the machine's Claude Code configuration. When Claude
@@ -42,4 +45,34 @@ pub fn set_mcp_enabled(app: AppHandle, name: String, enabled: bool) -> Result<()
 #[tauri::command]
 pub fn set_plugin_enabled(app: AppHandle, key: String, enabled: bool) -> Result<(), AppError> {
     plugins::set_enabled(&app, &key, enabled)
+}
+
+/// Everything Claude Code applies in one repo: MCP servers across user/project/
+/// local scope and plugins with their effective per-repo enabled state.
+#[tauri::command]
+pub fn repo_claude(app: AppHandle, path: String) -> Result<RepoClaude, AppError> {
+    let repo = Path::new(&path);
+    Ok(RepoClaude {
+        mcp: mcp::list_for_repo(&app, repo)?,
+        plugins: plugins::list_for_repo(&app, repo)?,
+    })
+}
+
+/// Enable/disable an MCP server for one repo. `scope` is `user`, `project`, or
+/// `local`; each is toggled by its own mechanism (see `RepoMcpServer`).
+#[tauri::command]
+pub fn set_repo_mcp_enabled(
+    app: AppHandle,
+    path: String,
+    name: String,
+    scope: String,
+    enabled: bool,
+) -> Result<(), AppError> {
+    mcp::set_repo_enabled(&app, Path::new(&path), &name, &scope, enabled)
+}
+
+/// Enable/disable a plugin for one repo (writes its `.claude/settings.local.json`).
+#[tauri::command]
+pub fn set_repo_plugin_enabled(path: String, key: String, enabled: bool) -> Result<(), AppError> {
+    plugins::set_repo_enabled(Path::new(&path), &key, enabled)
 }

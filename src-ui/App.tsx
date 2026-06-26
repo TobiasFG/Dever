@@ -71,8 +71,6 @@ export default function App() {
             onBack={goHome}
             onSelectSection={setSection}
             onPull={pull}
-            onToggleMcp={toggleMcp}
-            onTogglePlugin={togglePlugin}
           />
         ) : (
           <>

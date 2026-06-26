@@ -34,3 +34,25 @@ pub fn installed_plugins_json(app: &AppHandle) -> Result<PathBuf, AppError> {
         .join("plugins")
         .join("installed_plugins.json"))
 }
+
+/// `<repo>/.mcp.json` — project-scoped MCP servers, checked into the repo.
+pub fn repo_mcp_json(repo: &std::path::Path) -> PathBuf {
+    repo.join(".mcp.json")
+}
+
+/// `<repo>/.claude/settings.json` — shared project settings (committed).
+pub fn repo_settings(repo: &std::path::Path) -> PathBuf {
+    repo.join(".claude").join("settings.json")
+}
+
+/// `<repo>/.claude/settings.local.json` — private per-repo settings (gitignored).
+pub fn repo_settings_local(repo: &std::path::Path) -> PathBuf {
+    repo.join(".claude").join("settings.local.json")
+}
+
+/// Claude Code keys its `~/.claude.json` `projects` map with forward slashes,
+/// even on Windows (`C:/src/Dever`). Dever holds repo paths in the OS-native
+/// form (`C:\src\Dever`), so normalize before indexing that map.
+pub fn project_key(repo: &std::path::Path) -> String {
+    repo.to_string_lossy().replace('\\', "/")
+}

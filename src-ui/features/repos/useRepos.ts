@@ -21,8 +21,10 @@ export function useRepos() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const refresh = useCallback(async () => {
-    setLoading(true);
+  // Pull the latest repo + root state. `quiet` skips the loading flag so the
+  // periodic background poll doesn't flicker the spinner on every tick.
+  const load = useCallback(async (quiet: boolean) => {
+    if (!quiet) setLoading(true);
     setError(null);
     try {
       const [scanned, list] = await Promise.all([scanRepos(), listScanRoots()]);
@@ -31,9 +33,11 @@ export function useRepos() {
     } catch (e) {
       setError(String(e));
     } finally {
-      setLoading(false);
+      if (!quiet) setLoading(false);
     }
   }, []);
+
+  const refresh = useCallback(() => load(false), [load]);
 
   const addRoot = useCallback(async () => {
     const selected = await open({
@@ -108,6 +112,13 @@ export function useRepos() {
       setEditors(await listEditors().catch(() => []));
     })();
   }, [refresh]);
+
+  // Re-scan in the background every 5s so external changes (new repos, pulled
+  // branches) show up without pressing rescan.
+  useEffect(() => {
+    const id = setInterval(() => void load(true), 5000);
+    return () => clearInterval(id);
+  }, [load]);
 
   return {
     repos,

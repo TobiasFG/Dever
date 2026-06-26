@@ -1487,6 +1487,27 @@ button {
   padding: 1px 6px;
 }
 
+/* Scope subheader inside a single grouped card (MCP / plugins / CLAUDE.md). */
+.scope-group-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+  background: var(--surface-raised);
+  border-bottom: 1px solid var(--border);
+}
+.scope-group-count {
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text-faint);
+}
+
 /* ---------- endpoints placeholder ---------- */
 .endpoints-empty {
   display: flex;
