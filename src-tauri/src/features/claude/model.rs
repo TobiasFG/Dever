@@ -42,6 +42,21 @@ pub struct Plugin {
     pub enabled: bool,
 }
 
+/// The answer to a one-shot question asked of Claude Code about a repo, plus
+/// the run metadata the CLI reports back. Every field but `answer` is optional
+/// because the CLI's JSON shape drifts across versions. Mirrored in
+/// `src-ui/features/claude/types.ts`.
+#[derive(Debug, Clone, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ClaudeAnswer {
+    pub answer: String,
+    pub model: Option<String>,
+    pub cost_usd: Option<f64>,
+    pub duration_ms: Option<u64>,
+    pub num_turns: Option<u32>,
+    pub session_id: Option<String>,
+}
+
 /// One Claude Code config snapshot scoped to a single repository: the MCP
 /// servers and plugins that apply when Claude Code runs in that repo, across
 /// every scope. Mirrored in `src-ui/features/claude/types.ts`.

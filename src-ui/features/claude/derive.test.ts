@@ -1,7 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { mcpMeta, pluginMeta, statusDotColor, systemPromptMeta } from './derive';
+import { answerMeta, mcpMeta, pluginMeta, statusDotColor, systemPromptMeta } from './derive';
 import { colors } from '@/theme/colors';
-import type { McpServer, Plugin } from './types';
+import type { ClaudeAnswer, McpServer, Plugin } from './types';
+
+const answer = (over: Partial<ClaudeAnswer>): ClaudeAnswer => ({
+  answer: 'a',
+  model: null,
+  costUsd: null,
+  durationMs: null,
+  numTurns: null,
+  sessionId: null,
+  ...over,
+});
 
 describe('claude derive', () => {
   it('statusDotColor reflects detection', () => {
@@ -31,5 +41,24 @@ describe('claude derive', () => {
       { key: 'b@m', name: 'b', marketplace: 'm', scope: 'user', enabled: false },
     ];
     expect(pluginMeta(plugins)).toBe('1 enabled');
+  });
+
+  it('answerMeta builds a label from the parts the CLI reported', () => {
+    expect(
+      answerMeta(
+        answer({
+          model: 'claude-haiku-4-5-20251001',
+          durationMs: 8421,
+          costUsd: 0.0123,
+          numTurns: 4,
+        }),
+      ),
+    ).toBe('Haiku · 8.4s · $0.0123 · 4 turns');
+  });
+
+  it('answerMeta drops missing parts and singularizes one turn', () => {
+    expect(answerMeta(answer({ durationMs: 1000, numTurns: 1 }))).toBe('1.0s · 1 turn');
+    expect(answerMeta(answer({ model: 'claude-sonnet-4-6' }))).toBe('Sonnet');
+    expect(answerMeta(answer({ costUsd: 0 }))).toBe('');
   });
 });

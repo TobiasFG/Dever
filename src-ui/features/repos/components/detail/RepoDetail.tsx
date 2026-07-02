@@ -139,6 +139,7 @@ export function RepoDetail({
           <OverviewSection
             repo={repo}
             detail={detail}
+            claude={claude}
             onPull={onPull}
             onViewBranches={() => onSelectSection('branches')}
           />

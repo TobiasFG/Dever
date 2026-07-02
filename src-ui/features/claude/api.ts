@@ -1,5 +1,5 @@
 import { call } from '@/lib/ipc';
-import type { ClaudeStatus, McpScope, RepoClaude } from './types';
+import type { ClaudeAnswer, ClaudeStatus, McpScope, RepoClaude } from './types';
 
 export const claudeStatus = () => call<ClaudeStatus>('claude_status');
 export const readGlobalClaudeMd = () => call<string>('read_global_claude_md');
@@ -16,3 +16,7 @@ export const setRepoMcpEnabled = (path: string, name: string, scope: McpScope, e
   call<void>('set_repo_mcp_enabled', { path, name, scope, enabled });
 export const setRepoPluginEnabled = (path: string, key: string, enabled: boolean) =>
   call<void>('set_repo_plugin_enabled', { path, key, enabled });
+
+/** Ask Claude Code (Haiku, read-only) a one-shot question about a repo. */
+export const askClaude = (path: string, question: string) =>
+  call<ClaudeAnswer>('ask_claude', { path, question });

@@ -1,18 +1,22 @@
 import { useState } from 'react';
 import { Icon } from '@/components/Icon';
 import { colors } from '@/theme/colors';
+import type { ClaudeStatus } from '@/features/claude/types';
 import type { RepoDetailView } from '../../derive';
 import { useBranches } from '../../useBranches';
 import type { Repo } from '../../types';
+import { AskCard } from './AskCard';
 
 export function OverviewSection({
   repo,
   detail,
+  claude,
   onPull,
   onViewBranches,
 }: {
   repo: Repo;
   detail: RepoDetailView;
+  claude: ClaudeStatus | null;
   onPull: (path: string) => Promise<void>;
   onViewBranches: () => void;
 }) {
@@ -89,6 +93,9 @@ export function OverviewSection({
             )}
           </div>
         </div>
+
+        {/* ask claude about this repo */}
+        <AskCard repo={repo} detected={claude?.detected ?? false} />
 
         {/* recently updated branches */}
         {local.length > 0 && (
