@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react';
 import { Icon, IconName } from '@/components/Icon';
+import { NotificationCenter } from '@/features/notifications/components/NotificationCenter';
 import { REPO_SECTIONS, type RepoSection } from '@/features/repos/section';
 
 const SECTION_ICON: Record<RepoSection, IconName> = {
@@ -88,6 +89,7 @@ export function Sidebar({
       </div>
 
       <div className="rail-bottom">
+        <NotificationCenter />
         <button className="nav-btn" title="Settings">
           <Icon name="settings" size={22} />
         </button>

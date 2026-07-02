@@ -29,6 +29,10 @@ export type IconName =
   | 'more'
   | 'swap'
   | 'grip'
+  | 'chat'
+  | 'send'
+  | 'sparkles'
+  | 'bell'
   | 'close';
 
 type IconProps = {
@@ -211,6 +215,31 @@ const paths: Record<IconName, ReactNode> = {
       <circle cx="15" cy="12" r="1.3" />
       <circle cx="9" cy="18" r="1.3" />
       <circle cx="15" cy="18" r="1.3" />
+    </>
+  ),
+  chat: (
+    <>
+      <path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v6A2.5 2.5 0 0 1 17.5 15H9l-4 4z" />
+      <path d="M8.5 8h7" />
+      <path d="M8.5 11h4.5" />
+    </>
+  ),
+  send: (
+    <>
+      <path d="M5 12h13" />
+      <path d="M12 5l7 7-7 7" />
+    </>
+  ),
+  sparkles: (
+    <>
+      <path d="M12 4l1.6 4.9L18.5 10.5l-4.9 1.6L12 17l-1.6-4.9L5.5 10.5l4.9-1.6z" />
+      <path d="M18 4.5l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z" />
+    </>
+  ),
+  bell: (
+    <>
+      <path d="M6 9a6 6 0 0 1 12 0c0 5 1.5 6 1.5 6h-15S6 14 6 9z" />
+      <path d="M10 19a2 2 0 0 0 4 0" />
     </>
   ),
 };

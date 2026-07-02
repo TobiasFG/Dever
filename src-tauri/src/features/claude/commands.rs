@@ -1,6 +1,7 @@
 use crate::error::AppError;
 use crate::features::claude::{
-    claude_md, detect, mcp, model::ClaudeStatus, model::RepoClaude, plugins,
+    ask, claude_md, detect, mcp, model::ClaudeAnswer, model::ClaudeStatus, model::RepoClaude,
+    plugins,
 };
 use std::path::Path;
 use tauri::AppHandle;
@@ -75,4 +76,14 @@ pub fn set_repo_mcp_enabled(
 #[tauri::command]
 pub fn set_repo_plugin_enabled(path: String, key: String, enabled: bool) -> Result<(), AppError> {
     plugins::set_repo_enabled(Path::new(&path), &key, enabled)
+}
+
+/// Ask Claude Code a one-shot question about a repo, answered by Haiku in
+/// read-only mode. The CLI run can take many seconds, so it's offloaded to a
+/// blocking thread to keep the UI responsive.
+#[tauri::command]
+pub async fn ask_claude(path: String, question: String) -> Result<ClaudeAnswer, AppError> {
+    tauri::async_runtime::spawn_blocking(move || ask::ask(Path::new(&path), &question))
+        .await
+        .map_err(|e| AppError::new(format!("Ask task failed: {e}")))?
 }

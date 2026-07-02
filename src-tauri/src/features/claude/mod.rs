@@ -1,3 +1,4 @@
+pub mod ask;
 pub mod claude_md;
 pub mod commands;
 pub mod detect;

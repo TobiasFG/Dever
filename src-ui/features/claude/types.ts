@@ -28,6 +28,16 @@ export type ClaudeStatus = {
   plugins: Plugin[];
 };
 
+/** Mirrors the Rust `ClaudeAnswer` — a one-shot answer plus run metadata. */
+export type ClaudeAnswer = {
+  answer: string;
+  model: string | null;
+  costUsd: number | null;
+  durationMs: number | null;
+  numTurns: number | null;
+  sessionId: string | null;
+};
+
 /** MCP scope a repo-scoped server is defined in. */
 export type McpScope = 'user' | 'project' | 'local';
 

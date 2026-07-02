@@ -4,6 +4,7 @@ const { invoke } = vi.hoisted(() => ({ invoke: vi.fn() }));
 vi.mock('@tauri-apps/api/core', () => ({ invoke }));
 
 import {
+  askClaude,
   claudeStatus,
   readGlobalClaudeMd,
   setMcpEnabled,
@@ -44,6 +45,15 @@ describe('claude api', () => {
     expect(invoke).toHaveBeenCalledWith('set_plugin_enabled', {
       key: 'expo@official',
       enabled: true,
+    });
+  });
+
+  it('askClaude passes path and question', async () => {
+    invoke.mockResolvedValue({ answer: 'hi', model: null });
+    await askClaude('/repo', 'What is this?');
+    expect(invoke).toHaveBeenCalledWith('ask_claude', {
+      path: '/repo',
+      question: 'What is this?',
     });
   });
 });
