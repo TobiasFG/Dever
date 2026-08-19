@@ -222,16 +222,15 @@ function RepoRow({
       )}
       <span className="dot" style={{ background: repo.dotColor }} />
       <span className="repo-name">{repo.name}</span>
-      <span className="repo-path">{repo.path}</span>
-
-      <span className="branch" title={repo.branch}>
-        <Icon name="branch" size={12} color="var(--text-muted)" strokeWidth={1.8} />
-        <span>{repo.branch}</span>
-      </span>
+      <div className="repo-path-cell">
+        <span className="repo-path">{repo.path}</span>
+        <span className="branch" title={repo.branch}>
+          <Icon name="branch" size={12} color="var(--text-muted)" strokeWidth={1.8} />
+          <span>{repo.branch}</span>
+        </span>
+      </div>
 
       <StatusBadge repo={repo} />
-
-      <div className="spacer" />
 
       <div className="repo-actions" onClick={(e) => e.stopPropagation()}>
         {repo.canPull && <PullButton repo={repo} onPull={onPull} />}
@@ -489,7 +488,7 @@ export function RepoList({
       </div>
 
       {repos.length > 0 ? (
-        <div className="repo-list">
+        <div className={dndEnabled ? 'repo-list draggable' : 'repo-list'}>
           {repos.map((repo) => (
             <RepoRow
               key={repo.path}

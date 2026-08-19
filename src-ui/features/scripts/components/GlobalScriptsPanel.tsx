@@ -28,7 +28,7 @@ export function GlobalScriptsPanel() {
   };
 
   return (
-    <aside className="panel">
+    <aside className="panel panel-wide">
       <div className="section-head">
         <h2 className="section-title">
           Scripts
