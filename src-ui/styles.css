@@ -282,10 +282,10 @@ button {
 .scroll {
   flex: 1;
   overflow-y: auto;
-  padding: 28px 28px 40px;
+  padding: 24px 20px 40px;
 }
 .content {
-  max-width: 1320px;
+  max-width: 1780px;
   margin: 0 auto;
 }
 
@@ -306,11 +306,12 @@ button {
 }
 
 /* ---------- columns ---------- */
+/* Repositories + Claude share the first row; a wide panel takes the next one. */
 .columns {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 400px);
   gap: 24px;
-  align-items: flex-start;
+  align-items: start;
 }
 
 .section-head {
@@ -340,8 +341,7 @@ button {
 
 /* ---------- repositories ---------- */
 .repos {
-  flex: 1 1 560px;
-  min-width: 300px;
+  min-width: 0;
 }
 .filter-row {
   display: flex;
@@ -362,19 +362,27 @@ button {
   border-color: transparent;
 }
 
+/* The list owns the columns and each row is a subgrid of it, so every column is
+ * sized to the widest cell in the whole list — the status tags and actions line
+ * up down the list, and only the path/branch cell stretches. */
 .repo-list {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
+  display: grid;
+  grid-template-columns: 8px auto minmax(0, 1fr) auto auto;
+  column-gap: 12px;
+  row-gap: 7px;
+}
+.repo-list.draggable {
+  grid-template-columns: auto 8px auto minmax(0, 1fr) auto auto;
 }
 .repo-row {
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
   background: var(--surface-raised);
   border: 1px solid var(--border-strong);
   border-radius: 9px;
   padding: 8px 13px;
-  display: flex;
+  display: grid;
   align-items: center;
-  gap: 12px;
   transition: border-color 0.15s;
 }
 .repo-row {
@@ -397,13 +405,23 @@ button {
   font-weight: 600;
   color: var(--text-high);
   white-space: nowrap;
-  flex: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Path and branch share one column: the branch tag takes only what it needs and
+ * the path soaks up the rest, so a short branch leaves more room for the path.
+ * The tags still line up because the columns to their right are list-wide. */
+.repo-path-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
 }
 .repo-path {
   font-family: var(--mono);
   font-size: 11px;
   color: var(--text-faint);
-  flex: 0 1 auto;
+  flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -412,6 +430,8 @@ button {
 .branch {
   display: inline-flex;
   align-items: center;
+  flex: 0 1 auto;
+  max-width: 240px;
   gap: 5px;
   background: var(--surface);
   border: 1px solid var(--border-strong);
@@ -420,8 +440,6 @@ button {
   font-family: var(--mono);
   font-size: 11px;
   color: var(--text);
-  flex: none;
-  max-width: 170px;
 }
 .branch span {
   overflow: hidden;
@@ -431,8 +449,8 @@ button {
 .status {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 9px;
-  flex: none;
 }
 .status-item {
   display: inline-flex;
@@ -451,10 +469,6 @@ button {
   background: currentColor;
   flex: none;
 }
-.spacer {
-  flex: 1 1 8px;
-  min-width: 8px;
-}
 .features {
   display: flex;
   gap: 5px;
@@ -472,8 +486,8 @@ button {
 }
 .repo-actions {
   display: flex;
+  justify-content: flex-end;
   gap: 5px;
-  flex: none;
 }
 .icon-btn {
   width: 28px;
@@ -709,11 +723,13 @@ button {
 
 /* ---------- claude panel ---------- */
 .panel {
-  flex: 1 1 320px;
-  min-width: 280px;
-  max-width: 400px;
+  min-width: 0;
   display: flex;
   flex-direction: column;
+}
+/* A panel that owns a full row of its own, below the two-column first row. */
+.panel-wide {
+  grid-column: 1 / -1;
 }
 .status-light {
   display: flex;
@@ -2480,6 +2496,14 @@ button {
 }
 
 /* ---------- scripts ---------- */
+/* Across the full width a flat list runs far off the fold — flow it into columns. */
+.panel-wide .script-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+}
+.panel-wide .script-list .script-row {
+  border-bottom: 1px solid var(--border);
+}
 .script-row {
   display: flex;
   align-items: center;

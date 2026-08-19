@@ -19,7 +19,7 @@ export function ScriptList({
     return <div className="empty">{emptyText}</div>;
   }
   return (
-    <div className="card">
+    <div className="card script-list">
       {scripts.map((script) => {
         const busy = running === script.path;
         return (
