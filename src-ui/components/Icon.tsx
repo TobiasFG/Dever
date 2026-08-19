@@ -7,6 +7,7 @@ export type IconName =
   | 'claude'
   | 'docs'
   | 'endpoints'
+  | 'scripts'
   | 'settings'
   | 'search'
   | 'rescan'
@@ -83,6 +84,13 @@ const paths: Record<IconName, ReactNode> = {
     <>
       <path d="M8 4.5c-2 0-2 3-2 4.2s-1 2.3-2 2.3c1 0 2 1.1 2 2.3s0 4.2 2 4.2" />
       <path d="M16 4.5c2 0 2 3 2 4.2s1 2.3 2 2.3c-1 0-2 1.1-2 2.3s0 4.2-2 4.2" />
+    </>
+  ),
+  scripts: (
+    <>
+      <rect x="4" y="3.5" width="16" height="17" rx="2" />
+      <path d="M10 9.5l3 2.5-3 2.5" />
+      <path d="M14 15h2.5" />
     </>
   ),
   settings: (

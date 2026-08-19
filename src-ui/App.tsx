@@ -3,6 +3,7 @@ import { Sidebar } from '@/components/dashboard/Sidebar';
 import { TopBar } from '@/components/dashboard/TopBar';
 import { ClaudePanel } from '@/features/claude/components/ClaudePanel';
 import { useClaude } from '@/features/claude/useClaude';
+import { GlobalScriptsPanel } from '@/features/scripts/components/GlobalScriptsPanel';
 import { RepoList } from '@/features/repos/components/RepoList';
 import { RepoDetail } from '@/features/repos/components/detail/RepoDetail';
 import { useRepos } from '@/features/repos/useRepos';
@@ -112,6 +113,7 @@ export default function App() {
                     onTogglePlugin={togglePlugin}
                     onSaveSystemPrompt={saveSystemPrompt}
                   />
+                  <GlobalScriptsPanel />
                 </div>
               </div>
             </div>
