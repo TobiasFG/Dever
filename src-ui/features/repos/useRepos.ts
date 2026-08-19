@@ -2,11 +2,13 @@ import { useCallback, useEffect, useState } from 'react';
 import { open } from '@tauri-apps/plugin-dialog';
 import {
   addScanRoot,
+  getIncludeWorktrees,
   listEditors,
   listScanRoots,
   pullRepo,
   removeScanRoot,
   scanRepos,
+  setIncludeWorktrees as saveIncludeWorktrees,
   setRepoOrder,
 } from './api';
 import type { Editor, Repo } from './types';
@@ -18,6 +20,7 @@ export function useRepos() {
   const [repos, setRepos] = useState<Repo[]>([]);
   const [roots, setRoots] = useState<string[]>([]);
   const [editors, setEditors] = useState<Editor[]>([]);
+  const [includeWorktrees, setIncludeWorktrees] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,9 +30,14 @@ export function useRepos() {
     if (!quiet) setLoading(true);
     setError(null);
     try {
-      const [scanned, list] = await Promise.all([scanRepos(), listScanRoots()]);
+      const [scanned, list, worktrees] = await Promise.all([
+        scanRepos(),
+        listScanRoots(),
+        getIncludeWorktrees(),
+      ]);
       setRepos(scanned);
       setRoots(list);
+      setIncludeWorktrees(worktrees);
     } catch (e) {
       setError(String(e));
     } finally {
@@ -66,6 +74,23 @@ export function useRepos() {
       setRepos(await scanRepos());
     } catch (e) {
       setError(String(e));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Persist whether linked worktrees belong in the list, then re-scan — the
+  // backend decides what the list contains, so the toggle needs a fresh scan.
+  const toggleWorktrees = useCallback(async (include: boolean) => {
+    setIncludeWorktrees(include);
+    setLoading(true);
+    setError(null);
+    try {
+      await saveIncludeWorktrees(include);
+      setRepos(await scanRepos());
+    } catch (e) {
+      setError(String(e));
+      setIncludeWorktrees(!include);
     } finally {
       setLoading(false);
     }
@@ -124,11 +149,13 @@ export function useRepos() {
     repos,
     roots,
     editors,
+    includeWorktrees,
     loading,
     error,
     refresh,
     addRoot,
     removeRoot,
+    toggleWorktrees,
     reorder,
     pull,
     pullAll,

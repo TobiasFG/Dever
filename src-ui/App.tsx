@@ -18,11 +18,13 @@ export default function App() {
     repos,
     roots,
     editors,
+    includeWorktrees,
     loading,
     error,
     refresh,
     addRoot,
     removeRoot,
+    toggleWorktrees,
     reorder,
     pull,
     pullAll,
@@ -94,9 +96,11 @@ export default function App() {
                     query={query}
                     loading={loading}
                     roots={roots}
+                    includeWorktrees={includeWorktrees}
                     onAddRoot={addRoot}
                     onRescan={refresh}
                     onRemoveRoot={removeRoot}
+                    onToggleWorktrees={toggleWorktrees}
                     onReorder={reorder}
                     onPull={pull}
                     onPullAll={pullAll}

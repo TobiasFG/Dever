@@ -310,15 +310,45 @@ function ManageFoldersPanel({
   );
 }
 
+/** Switch controlling whether linked git worktrees appear in the list. */
+function WorktreeToggle({
+  includeWorktrees,
+  loading,
+  onToggle,
+}: {
+  includeWorktrees: boolean;
+  loading: boolean;
+  onToggle: (include: boolean) => void;
+}) {
+  return (
+    <span className="worktree-toggle" title="Include linked git worktrees in the list">
+      <span className="worktree-toggle-label">Worktrees</span>
+      <button
+        type="button"
+        role="switch"
+        aria-label="Include worktrees"
+        aria-checked={includeWorktrees}
+        className={includeWorktrees ? 'toggle on' : 'toggle'}
+        disabled={loading}
+        onClick={() => onToggle(!includeWorktrees)}
+      >
+        <span className="knob" />
+      </button>
+    </span>
+  );
+}
+
 export function RepoList({
   repos,
   editors,
   query,
   loading,
   roots,
+  includeWorktrees,
   onAddRoot,
   onRescan,
   onRemoveRoot,
+  onToggleWorktrees,
   onReorder,
   onPull,
   onPullAll,
@@ -329,9 +359,11 @@ export function RepoList({
   query: string;
   loading: boolean;
   roots: string[];
+  includeWorktrees: boolean;
   onAddRoot: () => void;
   onRescan: () => void;
   onRemoveRoot: (path: string) => void;
+  onToggleWorktrees: (include: boolean) => void;
   onReorder: (orderedPaths: string[]) => void;
   onPull: (path: string) => Promise<void>;
   onPullAll: (paths: string[]) => Promise<PullAllResult>;
@@ -417,6 +449,11 @@ export function RepoList({
           <span className="count-pill">{repos.length}</span>
         </h2>
         <div className="filter-row">
+          <WorktreeToggle
+            includeWorktrees={includeWorktrees}
+            loading={loading}
+            onToggle={onToggleWorktrees}
+          />
           {pullable.length > 0 && (
             <button
               className="btn-secondary"

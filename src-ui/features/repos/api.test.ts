@@ -5,6 +5,7 @@ vi.mock('@tauri-apps/api/core', () => ({ invoke }));
 
 import {
   addScanRoot,
+  getIncludeWorktrees,
   listBranches,
   listScanRoots,
   openInEditor,
@@ -13,6 +14,7 @@ import {
   removeScanRoot,
   revealInFileManager,
   scanRepos,
+  setIncludeWorktrees,
   setRepoOrder,
   switchBranch,
 } from './api';
@@ -91,5 +93,21 @@ describe('repos api', () => {
     invoke.mockResolvedValue(undefined);
     await revealInFileManager('/code/app');
     expect(invoke).toHaveBeenCalledWith('reveal_in_file_manager', { path: '/code/app' });
+  });
+});
+
+describe('worktree preference api', () => {
+  beforeEach(() => invoke.mockReset());
+
+  it('getIncludeWorktrees invokes get_include_worktrees', async () => {
+    invoke.mockResolvedValue(true);
+    await expect(getIncludeWorktrees()).resolves.toBe(true);
+    expect(invoke).toHaveBeenCalledWith('get_include_worktrees', undefined);
+  });
+
+  it('setIncludeWorktrees passes the include flag', async () => {
+    invoke.mockResolvedValue(undefined);
+    await setIncludeWorktrees(false);
+    expect(invoke).toHaveBeenCalledWith('set_include_worktrees', { include: false });
   });
 });

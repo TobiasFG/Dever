@@ -32,15 +32,28 @@ pub fn remove_scan_root(app: AppHandle, path: String) -> Result<Vec<String>, App
     Ok(roots)
 }
 
+/// Whether linked git worktrees are listed alongside normal clones.
+#[tauri::command]
+pub fn get_include_worktrees(app: AppHandle) -> Result<bool, AppError> {
+    config::load_include_worktrees(&app)
+}
+
+/// Persist the worktree preference. The caller re-scans to pick it up.
+#[tauri::command]
+pub fn set_include_worktrees(app: AppHandle, include: bool) -> Result<(), AppError> {
+    config::save_include_worktrees(&app, include)
+}
+
 /// Discover every repo under the configured roots and read each one's status
 /// concurrently. Repos whose status can't be read are skipped.
 #[tauri::command]
 pub fn scan_repos(app: AppHandle) -> Result<Vec<Repo>, AppError> {
     let roots = config::load_roots(&app)?;
+    let include_worktrees = config::load_include_worktrees(&app)?;
 
     let mut paths: Vec<PathBuf> = roots
         .iter()
-        .flat_map(|root| scan::discover(Path::new(root)))
+        .flat_map(|root| scan::discover(Path::new(root), include_worktrees))
         .collect();
     paths.sort();
     paths.dedup();
