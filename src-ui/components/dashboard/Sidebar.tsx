@@ -6,6 +6,7 @@ import { REPO_SECTIONS, type RepoSection } from '@/features/repos/section';
 const SECTION_ICON: Record<RepoSection, IconName> = {
   overview: 'dashboard',
   branches: 'branch',
+  scripts: 'scripts',
   claude: 'claude',
   docs: 'docs',
   endpoints: 'endpoints',

@@ -39,9 +39,11 @@ describe('repo list drag-and-drop', () => {
         query=""
         loading={false}
         roots={['/root']}
+        includeWorktrees={true}
         onAddRoot={() => {}}
         onRescan={() => {}}
         onRemoveRoot={() => {}}
+        onToggleWorktrees={() => {}}
         onReorder={onReorder}
         onPull={async () => {}}
         onPullAll={async () => ({ pulled: 0, failed: 0 })}
@@ -61,5 +63,40 @@ describe('repo list drag-and-drop', () => {
 
     fireEvent.drop(rows[1], { dataTransfer: transfer });
     expect(onReorder).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('worktree toggle', () => {
+  const renderList = (includeWorktrees: boolean, onToggleWorktrees = vi.fn()) =>
+    render(
+      <RepoList
+        repos={[repo('a', '/a')].map(deriveRepo)}
+        editors={[]}
+        query=""
+        loading={false}
+        roots={['/root']}
+        includeWorktrees={includeWorktrees}
+        onAddRoot={() => {}}
+        onRescan={() => {}}
+        onRemoveRoot={() => {}}
+        onToggleWorktrees={onToggleWorktrees}
+        onReorder={() => {}}
+        onPull={async () => {}}
+        onPullAll={async () => ({ pulled: 0, failed: 0 })}
+        onOpen={() => {}}
+      />,
+    );
+
+  it('reflects the current preference', () => {
+    const { getByRole } = renderList(true);
+    const sw = getByRole('switch', { name: 'Include worktrees' });
+    expect(sw.getAttribute('aria-checked')).toBe('true');
+  });
+
+  it('asks for the opposite of the current preference when clicked', () => {
+    const onToggleWorktrees = vi.fn();
+    const { getByRole } = renderList(false, onToggleWorktrees);
+    fireEvent.click(getByRole('switch', { name: 'Include worktrees' }));
+    expect(onToggleWorktrees).toHaveBeenCalledWith(true);
   });
 });

@@ -5,6 +5,9 @@ export const listScanRoots = () => call<string[]>('list_scan_roots');
 export const addScanRoot = (path: string) => call<string[]>('add_scan_root', { path });
 export const removeScanRoot = (path: string) => call<string[]>('remove_scan_root', { path });
 export const scanRepos = () => call<Repo[]>('scan_repos');
+export const getIncludeWorktrees = () => call<boolean>('get_include_worktrees');
+export const setIncludeWorktrees = (include: boolean) =>
+  call<void>('set_include_worktrees', { include });
 export const setRepoOrder = (order: string[]) => call<void>('set_repo_order', { order });
 export const pullRepo = (path: string) => call<Repo>('pull_repo', { path });
 

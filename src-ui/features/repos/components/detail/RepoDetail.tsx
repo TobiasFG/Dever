@@ -7,6 +7,7 @@ import { openInEditor, openTerminal, revealInFileManager } from '../../api';
 import { deriveDetail } from '../../derive';
 import { type RepoSection, SECTION_LABEL } from '../../section';
 import type { Editor, Repo } from '../../types';
+import { ScriptsSection } from '@/features/scripts/components/ScriptsSection';
 import { OverviewSection } from './OverviewSection';
 import { BranchesSection } from './BranchesSection';
 import { ClaudeSection } from './ClaudeSection';
@@ -145,6 +146,7 @@ export function RepoDetail({
           />
         )}
         {section === 'branches' && <BranchesSection repo={repo} />}
+        {section === 'scripts' && <ScriptsSection repo={repo} />}
         {section === 'claude' && <ClaudeSection repo={repo} claude={claude} />}
         {section === 'docs' && (
           <DocsViewer repoPath={repo.path} onOpen={editors.length > 0 ? openFile : undefined} />

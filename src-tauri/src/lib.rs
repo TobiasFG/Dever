@@ -8,8 +8,12 @@ use features::claude::commands::{
 };
 use features::docs::commands::{list_docs, read_doc};
 use features::repos::commands::{
-    add_scan_root, list_branches, list_editors, list_scan_roots, open_in_editor, open_terminal,
-    pull_repo, remove_scan_root, reveal_in_file_manager, scan_repos, set_repo_order, switch_branch,
+    add_scan_root, get_include_worktrees, list_branches, list_editors, list_scan_roots,
+    open_in_editor, open_terminal, pull_repo, remove_scan_root, reveal_in_file_manager, scan_repos,
+    set_include_worktrees, set_repo_order, switch_branch,
+};
+use features::scripts::commands::{
+    get_scripts_root, list_global_scripts, list_repo_scripts, run_script, set_scripts_root,
 };
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -49,7 +53,14 @@ pub fn run() {
             set_repo_plugin_enabled,
             ask_claude,
             list_docs,
-            read_doc
+            read_doc,
+            list_repo_scripts,
+            list_global_scripts,
+            get_scripts_root,
+            set_scripts_root,
+            run_script,
+            get_include_worktrees,
+            set_include_worktrees
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
