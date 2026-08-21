@@ -220,6 +220,24 @@ button {
   border-radius: 4px;
   padding: 1px 6px;
   letter-spacing: 0.3px;
+  background: none;
+  font-family: inherit;
+}
+
+button.brand-version {
+  cursor: pointer;
+}
+
+button.brand-version:hover {
+  color: var(--text);
+  border-color: var(--text-muted);
+}
+
+/* An update is waiting — the chip stops being decoration and asks to be clicked. */
+.brand-version-update,
+button.brand-version-update:hover {
+  color: var(--accent);
+  border-color: var(--accent);
 }
 
 .search-wrap {

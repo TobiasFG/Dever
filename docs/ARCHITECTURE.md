@@ -23,6 +23,7 @@ that tree; this page is the starting point for the architecture as a whole.
 ## Guides
 
 - [Add a feature slice](guides/add-feature.md) — the end-to-end procedure.
+- [Release a version](guides/release.md) — tagging, the build, and the in-app updater.
 - [Maintaining the docs](guides/maintaining-docs.md) — how to add, edit, or extend documentation.
 
 ## How docs reach agents

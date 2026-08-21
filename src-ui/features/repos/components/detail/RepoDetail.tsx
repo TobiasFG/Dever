@@ -7,6 +7,7 @@ import { deriveDetail } from '../../derive';
 import { type RepoSection, SECTION_LABEL } from '../../section';
 import type { Editor, Repo } from '../../types';
 import { ScriptsSection } from '@/features/scripts/components/ScriptsSection';
+import { UpdateChip } from '@/features/updates/components/UpdateChip';
 import { EditorMenuPanel } from '../EditorMenu';
 import { OverviewSection } from './OverviewSection';
 import { BranchesSection } from './BranchesSection';
@@ -42,7 +43,7 @@ export function RepoDetail({
       <header className="topbar detail-topbar">
         <div className="brand">
           <span className="brand-name">Dev&apos;er</span>
-          <span className="brand-version">v0.1</span>
+          <UpdateChip />
         </div>
         <div className="detail-divider" />
         <button className="btn-back" title="Back to dashboard" onClick={onBack}>

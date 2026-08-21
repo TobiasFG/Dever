@@ -1,0 +1,7 @@
+{
+  "identifier": "desktop-capability",
+  "description": "desktop-only permissions: checking for and installing updates, and relaunching after one",
+  "platforms": ["macOS", "windows", "linux"],
+  "windows": ["main"],
+  "permissions": ["updater:default", "process:allow-restart"]
+}

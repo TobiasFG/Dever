@@ -1,4 +1,5 @@
 import { Icon } from '@/components/Icon';
+import { UpdateChip } from '@/features/updates/components/UpdateChip';
 
 export function TopBar({
   query,
@@ -11,7 +12,7 @@ export function TopBar({
     <header className="topbar">
       <div className="brand">
         <span className="brand-name">Dev&apos;er</span>
-        <span className="brand-version">v0.1</span>
+        <UpdateChip />
       </div>
 
       <div className="search-wrap">
