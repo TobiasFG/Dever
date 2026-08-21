@@ -4,7 +4,19 @@ Dever is a cross-platform **desktop** app (macOS, Linux, Windows) that helps dev
 
 Built with **[Tauri v2](https://v2.tauri.app/)** (Rust backend + the OS's native webview) and a **React 19 + Vite + TypeScript** frontend.
 
-## Prerequisites
+## Install it (you just want to use Dever)
+
+1. Grab the latest `Dever_x.y.z_x64-setup.exe` from
+   [Releases](https://github.com/TobiasFG/Dever/releases/latest).
+2. Run it. Windows shows "Windows protected your PC" because the installer isn't
+   code-signed yet — **More info → Run anyway**. It installs for your user only, so no
+   admin rights are needed.
+
+After that, Dever updates itself: it checks on launch, and the version chip next to the
+wordmark turns into **Update to x.y.z** when a new release is out. Click it, then restart.
+No more warnings after the first install.
+
+## Prerequisites (you want to work on Dever)
 
 - [Bun](https://bun.sh)
 - [Rust toolchain](https://www.rust-lang.org/tools/install) (`rustup`)

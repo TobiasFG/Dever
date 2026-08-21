@@ -4,6 +4,7 @@
 
 - **Codebase structure, principles, and conventions:** [ARCHITECTURE.md](ARCHITECTURE.md).
 - **Adding a feature:** [guides/add-feature.md](guides/add-feature.md).
+- **Shipping a version:** [guides/release.md](guides/release.md).
 - **Changing the documentation itself** (conventions, guides, or the AI-agent adapters):
   [guides/maintaining-docs.md](guides/maintaining-docs.md).
 
