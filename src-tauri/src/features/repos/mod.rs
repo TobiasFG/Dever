@@ -5,4 +5,5 @@ pub mod fs;
 pub mod git;
 pub mod model;
 pub mod scan;
+pub mod solutions;
 pub mod terminal;

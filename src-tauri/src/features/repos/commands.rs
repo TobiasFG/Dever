@@ -2,8 +2,8 @@ use crate::config;
 use crate::error::AppError;
 use crate::features::repos::{
     branches, editors, fs, git,
-    model::{Branch, Editor, Repo},
-    scan, terminal,
+    model::{Branch, Editor, Repo, Solution},
+    scan, solutions, terminal,
 };
 use std::path::{Path, PathBuf};
 use std::thread;
@@ -122,6 +122,12 @@ pub fn list_editors() -> Result<Vec<Editor>, AppError> {
 #[tauri::command]
 pub fn open_in_editor(path: String, editor_id: String) -> Result<(), AppError> {
     editors::open(&path, &editor_id)
+}
+
+/// The `.sln` and `.csproj` files in a repo, for the Visual Studio picker.
+#[tauri::command]
+pub fn list_solutions(path: String) -> Result<Vec<Solution>, AppError> {
+    Ok(solutions::discover(Path::new(&path)))
 }
 
 /// Open a terminal session at the repo root.

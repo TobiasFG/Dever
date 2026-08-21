@@ -35,3 +35,26 @@ pub struct Editor {
     pub id: String,
     pub name: String,
 }
+
+/// Whether a Visual Studio target is a solution file or a bare project file.
+/// Mirrored in `src-ui/features/repos/types.ts` — change both together.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum SolutionKind {
+    Solution,
+    Project,
+}
+
+/// A `.sln` or `.csproj` file in a repo that Visual Studio can open. Mirrored
+/// in `src-ui/features/repos/types.ts` — change both together.
+#[derive(Debug, Clone, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Solution {
+    /// Absolute path to the file — this is what Visual Studio is handed.
+    pub path: String,
+    /// Display name (the file name).
+    pub name: String,
+    /// Path relative to the repo root, with forward slashes.
+    pub rel_path: String,
+    pub kind: SolutionKind,
+}

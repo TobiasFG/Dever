@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useRef, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 
 /**
  * A button-anchored floating panel. The `trigger` render-prop draws the anchor
@@ -16,6 +16,9 @@ export function Popover({
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  // Stable identity so panels can depend on `close` in an effect without
+  // re-running it every time the anchor re-renders.
+  const close = useCallback(() => setOpen(false), []);
 
   useEffect(() => {
     if (!open) return;
@@ -38,7 +41,7 @@ export function Popover({
       {trigger({ open, toggle: () => setOpen((v) => !v) })}
       {open && (
         <div className="popover" data-align={align}>
-          {children(() => setOpen(false))}
+          {children(close)}
         </div>
       )}
     </div>

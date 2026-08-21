@@ -8,6 +8,7 @@ import {
   getIncludeWorktrees,
   listBranches,
   listScanRoots,
+  listSolutions,
   openInEditor,
   openTerminal,
   pullRepo,
@@ -81,6 +82,12 @@ describe('repos api', () => {
       path: '/code/app',
       editorId: 'vscode',
     });
+  });
+
+  it('listSolutions passes the path argument', async () => {
+    invoke.mockResolvedValue([]);
+    await listSolutions('/code/app');
+    expect(invoke).toHaveBeenCalledWith('list_solutions', { path: '/code/app' });
   });
 
   it('openTerminal passes the path argument', async () => {
