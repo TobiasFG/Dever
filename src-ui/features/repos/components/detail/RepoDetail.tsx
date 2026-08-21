@@ -1,5 +1,4 @@
 import { Icon } from '@/components/Icon';
-import { Menu } from '@/components/Menu';
 import { Popover } from '@/components/Popover';
 import { DocsViewer } from '@/features/docs/components/DocsViewer';
 import type { ClaudeStatus } from '@/features/claude/types';
@@ -8,6 +7,7 @@ import { deriveDetail } from '../../derive';
 import { type RepoSection, SECTION_LABEL } from '../../section';
 import type { Editor, Repo } from '../../types';
 import { ScriptsSection } from '@/features/scripts/components/ScriptsSection';
+import { EditorMenuPanel } from '../EditorMenu';
 import { OverviewSection } from './OverviewSection';
 import { BranchesSection } from './BranchesSection';
 import { ClaudeSection } from './ClaudeSection';
@@ -98,22 +98,9 @@ export function RepoDetail({
                   </button>
                 )}
               >
-                {(close) =>
-                  editors.length === 0 ? (
-                    <div className="menu">
-                      <div className="menu-empty">No editors found</div>
-                    </div>
-                  ) : (
-                    <Menu
-                      close={close}
-                      items={editors.map((e) => ({
-                        icon: 'editor',
-                        label: e.name,
-                        onSelect: () => void openInEditor(repo.path, e.id),
-                      }))}
-                    />
-                  )
-                }
+                {(close) => (
+                  <EditorMenuPanel repoPath={repo.path} editors={editors} close={close} />
+                )}
               </Popover>
               <button
                 className="btn-secondary"

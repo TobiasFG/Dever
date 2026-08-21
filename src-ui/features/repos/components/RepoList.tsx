@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { Icon } from '@/components/Icon';
 import { Menu, MenuItem } from '@/components/Menu';
 import { Popover } from '@/components/Popover';
-import { openInEditor, openTerminal, revealInFileManager } from '../api';
+import { openTerminal, revealInFileManager } from '../api';
 import type { RepoView } from '../derive';
 import type { Editor } from '../types';
 import type { PullAllResult } from '../useRepos';
 import { BranchCombobox, BranchPanel } from './BranchCombobox';
+import { EditorMenuButton, SolutionPanel, editorItems } from './EditorMenu';
 
 function StatusBadge({ repo }: { repo: RepoView }) {
   return (
@@ -84,44 +85,9 @@ function PullButton({ repo, onPull }: { repo: RepoView; onPull: (path: string) =
   );
 }
 
-/** Card dropdown listing the editors detected on this machine. */
-function EditorMenu({ repo, editors }: { repo: RepoView; editors: Editor[] }) {
-  return (
-    <Popover
-      trigger={({ open, toggle }) => (
-        <button
-          type="button"
-          className="icon-btn"
-          title="Open in editor"
-          aria-expanded={open}
-          onClick={toggle}
-        >
-          <Icon name="editor" size={14} strokeWidth={1.8} />
-        </button>
-      )}
-    >
-      {(close) =>
-        editors.length === 0 ? (
-          <div className="menu">
-            <div className="menu-empty">No editors found</div>
-          </div>
-        ) : (
-          <Menu
-            close={close}
-            items={editors.map((e) => ({
-              icon: 'editor',
-              label: e.name,
-              onSelect: () => void openInEditor(repo.path, e.id),
-            }))}
-          />
-        )
-      }
-    </Popover>
-  );
-}
-
 /** "More actions" dropdown — every action, with icon + text. Selecting Switch
- * branch swaps the panel to the branch combobox in place. */
+ * branch swaps the panel to the branch combobox in place, and Visual Studio
+ * swaps it to the solution picker. */
 function MoreActionsPanel({
   repo,
   editors,
@@ -133,9 +99,12 @@ function MoreActionsPanel({
   close: () => void;
   onSwitched: () => void;
 }) {
-  const [view, setView] = useState<'menu' | 'branch'>('menu');
+  const [view, setView] = useState<'menu' | 'branch' | 'solutions'>('menu');
   if (view === 'branch') {
     return <BranchPanel repo={repo} close={close} onSwitched={onSwitched} />;
+  }
+  if (view === 'solutions') {
+    return <SolutionPanel repoPath={repo.path} close={close} />;
   }
   const items: MenuItem[] = [
     { icon: 'open', label: 'Open', onSelect: () => {} },
@@ -147,11 +116,12 @@ function MoreActionsPanel({
       onSelect: () => setView('branch'),
     },
     { icon: 'terminal', label: 'Start terminal', onSelect: () => void openTerminal(repo.path) },
-    ...editors.map<MenuItem>((e) => ({
-      icon: 'editor',
-      label: `Open in ${e.name}`,
-      onSelect: () => void openInEditor(repo.path, e.id),
-    })),
+    ...editorItems(
+      repo.path,
+      editors,
+      () => setView('solutions'),
+      (name) => `Open in ${name}`,
+    ),
     {
       icon: 'file',
       label: 'Reveal in Finder',
@@ -246,7 +216,7 @@ function RepoRow({
         >
           <Icon name="terminal" size={14} strokeWidth={1.8} />
         </button>
-        <EditorMenu repo={repo} editors={editors} />
+        <EditorMenuButton repoPath={repo.path} editors={editors} />
         <Popover
           trigger={({ open, toggle }) => (
             <button

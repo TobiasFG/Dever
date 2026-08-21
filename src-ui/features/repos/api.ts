@@ -1,5 +1,5 @@
 import { call } from '@/lib/ipc';
-import type { Branch, Editor, Repo } from './types';
+import type { Branch, Editor, Repo, Solution } from './types';
 
 export const listScanRoots = () => call<string[]>('list_scan_roots');
 export const addScanRoot = (path: string) => call<string[]>('add_scan_root', { path });
@@ -17,5 +17,6 @@ export const switchBranch = (path: string, name: string, isRemote: boolean) =>
 export const listEditors = () => call<Editor[]>('list_editors');
 export const openInEditor = (path: string, editorId: string) =>
   call<void>('open_in_editor', { path, editorId });
+export const listSolutions = (path: string) => call<Solution[]>('list_solutions', { path });
 export const openTerminal = (path: string) => call<void>('open_terminal', { path });
 export const revealInFileManager = (path: string) => call<void>('reveal_in_file_manager', { path });
