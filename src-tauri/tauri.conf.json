@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "Dever",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "identifier": "dk.immeo.dever",
   "build": {
     "frontendDist": "../dist",
@@ -48,7 +48,7 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDg3MTVCQTM1OTRDQTkwNjQKUldSa2tNcVVOYm9WaHhya0NhZmQwa1RrR1BrMnBPT2pRSGxIbUFXeWJBc0EwTW1LS25JMXh5NGoK",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDYyN0IzMEYyNzQzMjI3RDQKUldUVUp6SjA4akI3WXM3Tkh5L2xzdWR5aUY4WWM0Vko0c2FRdlN6SkswaEt2c3ovVzJaVjg4VWQK",
       "endpoints": ["https://github.com/TobiasFG/Dever/releases/latest/download/latest.json"],
       "windows": {
         "installMode": "passive"

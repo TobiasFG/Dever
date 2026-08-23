@@ -44,16 +44,22 @@ fails quietly there; test the real flow with an installed build.
 ## The signing key
 
 `TAURI_SIGNING_PRIVATE_KEY` signs the artifacts; the matching public key sits in
-`src-tauri/tauri.conf.json` under `plugins.updater.pubkey`.
+`src-tauri/tauri.conf.json` under `plugins.updater.pubkey`. The key has no passphrase, so
+`TAURI_SIGNING_PRIVATE_KEY_PASSWORD` is unset — an unset secret arrives as the empty
+string, which is what a passphrase-less key expects.
 
 **If the private key is lost, no installed copy can ever be updated again** — they'd all
-have to reinstall by hand. It lives in two places:
+have to reinstall by hand. Rotating it means replacing every existing install manually, so
+treat that as a last resort.
 
-- GitHub repository secrets (so CI can sign)
-- the shared developer Key Vault (so a human can recover it)
+It must therefore live in two places:
 
-Rotating the key means every existing install must be replaced manually, so treat it as a
-last resort.
+- GitHub repository secrets, so CI can sign. Write-only — you cannot read it back out, so
+  this does not count as a backup.
+- A durable store outside this repo and outside any one laptop, so a human can recover it.
+  **TODO: name the actual store here** (team password manager, Azure Key Vault, …) once
+  the key has been filed in one. As of the 0.1.0 keypair, this step is outstanding — the
+  only copy is `~/.tauri/dever.key` on the machine that generated it.
 
 ## SmartScreen
 
