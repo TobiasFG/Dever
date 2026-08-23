@@ -71,12 +71,30 @@ per month, requires a verified business) via `bundle.windows.signCommand`; see
 certificate does *not* remove the warning until it accrues reputation; only EV or Azure
 Public Trust does.
 
-## Adding platforms
+## Platforms
 
-The release matrix builds Windows only, because that's what the team runs. Add a
-`macos-latest` row (with `--target aarch64-apple-darwin`) or `ubuntu-22.04` to
-`.github/workflows/release.yml`; the updater handles those bundles identically. macOS also
-needs notarization before it will install cleanly elsewhere.
+The release matrix builds four bundles, all signed for the updater the same way:
+
+| Row | Produces |
+| --- | --- |
+| `windows-latest` | NSIS `-setup.exe` (what the updater uses) and an `.msi` |
+| `macos-latest` + `--target aarch64-apple-darwin` | Apple Silicon `.app`/`.dmg` |
+| `macos-latest` + `--target x86_64-apple-darwin` | Intel `.app`/`.dmg` |
+| `ubuntu-22.04` | `.deb` and `.AppImage` |
+
+`fail-fast: false` means one platform failing still ships the others. The Ubuntu row needs
+WebKitGTK and friends installed via `apt` first — that's the `install Linux system
+dependencies` step, guarded to that row.
+
+**macOS bundles are neither code-signed nor notarized.** Gatekeeper will refuse to open
+them with "Dever is damaged and can't be opened" — the misleading message it gives for
+unsigned apps. Users have to right-click → Open, or run
+`xattr -dr com.apple.quarantine /Applications/Dever.app`. Fixing it properly needs an Apple
+Developer account ($99/yr) plus notarization credentials in CI. Linux `.deb`/`.AppImage`
+have no equivalent gate.
+
+The frontend is only exercised on Windows today, so treat the first macOS and Linux builds
+as untested at runtime — they compile, which is not the same as working.
 
 ## If a release goes wrong
 
