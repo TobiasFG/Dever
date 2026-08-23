@@ -13,8 +13,8 @@ updates itself from that release. This is the whole procedure.
 2. Commit the bump, then tag and push:
 
    ```bash
-   git tag dever-v0.2.0
-   git push origin dever-v0.2.0
+   git tag dever-v0.3.0
+   git push origin dever-v0.3.0
    ```
 
 3. `.github/workflows/release.yml` builds the bundles, signs them for the updater, and
@@ -86,12 +86,15 @@ The release matrix builds four bundles, all signed for the updater the same way:
 WebKitGTK and friends installed via `apt` first — that's the `install Linux system
 dependencies` step, guarded to that row.
 
-**macOS bundles are neither code-signed nor notarized.** Gatekeeper will refuse to open
-them with "Dever is damaged and can't be opened" — the misleading message it gives for
-unsigned apps. Users have to right-click → Open, or run
-`xattr -dr com.apple.quarantine /Applications/Dever.app`. Fixing it properly needs an Apple
-Developer account ($99/yr) plus notarization credentials in CI. Linux `.deb`/`.AppImage`
-have no equivalent gate.
+**macOS bundles are not notarized.** They are ad-hoc signed
+(`bundle.macOS.signingIdentity: "-"`), which is what keeps Gatekeeper from calling the app
+"damaged and can't be opened" — the message it gives for a bundle with no signature at all.
+Ad-hoc signed still isn't *trusted*, so the first launch is refused with "Apple could not
+verify Dever"; the user opens it via right-click → Open, or System Settings → Privacy &
+Security → **Open Anyway**. If a copy is already quarantined and still reports as damaged,
+`xattr -dr com.apple.quarantine /Applications/Dever.app` clears it. Removing the prompt
+entirely needs an Apple Developer account ($99/yr) plus notarization credentials in CI.
+Linux `.deb`/`.AppImage` have no equivalent gate.
 
 The frontend is only exercised on Windows today, so treat the first macOS and Linux builds
 as untested at runtime — they compile, which is not the same as working.

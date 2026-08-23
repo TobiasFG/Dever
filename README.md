@@ -12,6 +12,11 @@ Built with **[Tauri v2](https://v2.tauri.app/)** (Rust backend + the OS's native
    code-signed yet — **More info → Run anyway**. It installs for your user only, so no
    admin rights are needed.
 
+   On macOS, download the `.dmg` for your chip, then open Dever the first time with
+   right-click → **Open** (or System Settings → Privacy & Security → **Open Anyway**) — the
+   app isn't notarized yet. If macOS calls it damaged, clear the quarantine flag with
+   `xattr -dr com.apple.quarantine /Applications/Dever.app`.
+
 After that, Dever updates itself: it checks on launch, and the version chip next to the
 wordmark turns into **Update to x.y.z** when a new release is out. Click it, then restart.
 No more warnings after the first install.
