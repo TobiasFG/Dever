@@ -2614,3 +2614,35 @@ button.brand-version-update:hover {
   opacity: 0.6;
   cursor: default;
 }
+
+/* ---------- readme card (repo overview) ---------- */
+.readme-body {
+  padding: 16px 18px;
+}
+.readme-body-clamped {
+  max-height: 420px;
+  overflow: hidden;
+  mask-image: linear-gradient(to bottom, #000 320px, transparent 420px);
+}
+.readme-body .doc-body > *:first-child {
+  margin-top: 0;
+}
+.readme-foot {
+  padding: 0 18px 16px;
+}
+.readme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 9px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 12.5px;
+  cursor: pointer;
+}
+.readme-toggle:hover {
+  color: var(--text);
+  background: var(--surface-hover);
+}

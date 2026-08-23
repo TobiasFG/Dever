@@ -131,6 +131,7 @@ export function RepoDetail({
             claude={claude}
             onPull={onPull}
             onViewBranches={() => onSelectSection('branches')}
+            onViewDocs={() => onSelectSection('docs')}
           />
         )}
         {section === 'branches' && <BranchesSection repo={repo} />}

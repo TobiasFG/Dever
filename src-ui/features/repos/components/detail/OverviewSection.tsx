@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Icon } from '@/components/Icon';
 import { colors } from '@/theme/colors';
 import type { ClaudeStatus } from '@/features/claude/types';
+import { ReadmeCard } from '@/features/docs/components/ReadmeCard';
 import type { RepoDetailView } from '../../derive';
 import { useBranches } from '../../useBranches';
 import type { Repo } from '../../types';
@@ -13,12 +14,14 @@ export function OverviewSection({
   claude,
   onPull,
   onViewBranches,
+  onViewDocs,
 }: {
   repo: Repo;
   detail: RepoDetailView;
   claude: ClaudeStatus | null;
   onPull: (path: string) => Promise<void>;
   onViewBranches: () => void;
+  onViewDocs: () => void;
 }) {
   const { branches } = useBranches(repo.path);
   const [pulling, setPulling] = useState(false);
@@ -93,6 +96,9 @@ export function OverviewSection({
             )}
           </div>
         </div>
+
+        {/* the repo's top-level readme */}
+        <ReadmeCard repoPath={repo.path} onOpenDocs={onViewDocs} />
 
         {/* ask claude about this repo */}
         <AskCard repo={repo} detected={claude?.detected ?? false} />

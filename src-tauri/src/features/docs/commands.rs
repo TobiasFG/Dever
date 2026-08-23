@@ -1,7 +1,7 @@
 use crate::error::AppError;
 use crate::features::docs::{
     model::{DocFile, DocNode},
-    scan,
+    readme, scan,
 };
 use std::path::Path;
 use std::time::UNIX_EPOCH;
@@ -45,6 +45,34 @@ pub fn read_doc(path: String, rel: String) -> Result<DocFile, AppError> {
     })
 }
 
+/// Read the repo's top-level readme, or `None` if it has none.
+#[tauri::command]
+pub fn read_readme(path: String) -> Result<Option<DocFile>, AppError> {
+    let repo = Path::new(&path);
+    let Some(target) = readme::find(repo) else {
+        return Ok(None);
+    };
+    let rel = target
+        .strip_prefix(repo)
+        .unwrap_or(&target)
+        .to_string_lossy()
+        .replace('\\', "/");
+    let content = std::fs::read_to_string(&target)?;
+    let modified = target
+        .metadata()
+        .and_then(|m| m.modified())
+        .ok()
+        .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
+        .map(|d| d.as_millis() as u64)
+        .unwrap_or(0);
+
+    Ok(Some(DocFile {
+        path: rel,
+        content,
+        modified,
+    }))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -74,5 +102,23 @@ mod tests {
         let doc = read_doc(repo.to_string_lossy().to_string(), "README.md".to_string()).unwrap();
         assert_eq!(doc.content, "# hello");
         assert_eq!(doc.path, "README.md");
+    }
+
+    #[test]
+    fn read_readme_returns_none_without_one() {
+        let tmp = tempfile::tempdir().unwrap();
+        let res = read_readme(tmp.path().to_string_lossy().to_string()).unwrap();
+        assert!(res.is_none());
+    }
+
+    #[test]
+    fn read_readme_returns_the_root_readme() {
+        let tmp = tempfile::tempdir().unwrap();
+        fs::write(tmp.path().join("README.md"), "# hello").unwrap();
+        let doc = read_readme(tmp.path().to_string_lossy().to_string())
+            .unwrap()
+            .unwrap();
+        assert_eq!(doc.path, "README.md");
+        assert_eq!(doc.content, "# hello");
     }
 }

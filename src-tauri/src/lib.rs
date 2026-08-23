@@ -6,7 +6,7 @@ use features::claude::commands::{
     ask_claude, claude_status, read_global_claude_md, repo_claude, set_mcp_enabled,
     set_plugin_enabled, set_repo_mcp_enabled, set_repo_plugin_enabled, write_global_claude_md,
 };
-use features::docs::commands::{list_docs, read_doc};
+use features::docs::commands::{list_docs, read_doc, read_readme};
 use features::repos::commands::{
     add_scan_root, get_include_worktrees, list_branches, list_editors, list_scan_roots,
     list_solutions, open_in_editor, open_terminal, pull_repo, remove_scan_root,
@@ -57,6 +57,7 @@ pub fn run() {
             ask_claude,
             list_docs,
             read_doc,
+            read_readme,
             list_repo_scripts,
             list_global_scripts,
             get_scripts_root,
