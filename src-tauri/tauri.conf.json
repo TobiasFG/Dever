@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "Dever",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "identifier": "dk.immeo.dever",
   "build": {
     "frontendDist": "../dist",
