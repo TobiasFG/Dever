@@ -8,9 +8,10 @@ use features::claude::commands::{
 };
 use features::docs::commands::{list_docs, read_doc, read_readme};
 use features::repos::commands::{
-    add_scan_root, get_include_worktrees, list_branches, list_editors, list_scan_roots,
-    list_solutions, open_in_editor, open_terminal, pull_repo, remove_scan_root,
-    reveal_in_file_manager, scan_repos, set_include_worktrees, set_repo_order, switch_branch,
+    add_scan_root, delete_local_branch, delete_remote_branch, get_include_worktrees, list_branches,
+    list_editors, list_scan_roots, list_solutions, open_in_editor, open_terminal, pull_repo,
+    remove_scan_root, reveal_in_file_manager, scan_repos, set_include_worktrees, set_repo_order,
+    switch_branch,
 };
 use features::scripts::commands::{
     get_scripts_root, list_global_scripts, list_repo_scripts, run_script, set_scripts_root,
@@ -41,6 +42,8 @@ pub fn run() {
             pull_repo,
             list_branches,
             switch_branch,
+            delete_local_branch,
+            delete_remote_branch,
             list_editors,
             list_solutions,
             open_in_editor,

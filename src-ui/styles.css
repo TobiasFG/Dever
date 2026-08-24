@@ -29,6 +29,7 @@
   --avatar-border: #4a3866;
   --pill-on-green: #7ee2b8;
   --pill-bg-green: #1c3329;
+  --pill-bg-red: #3a1f1e;
 
   --mono: 'SF Mono', SFMono-Regular, ui-monospace, Menlo, Consolas, monospace;
   --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -2645,4 +2646,60 @@ button.brand-version-update:hover {
 .readme-toggle:hover {
   color: var(--text);
   background: var(--surface-hover);
+}
+
+/* ---------- branches: where a branch lives + delete ---------- */
+.branch-list-sub {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.branch-where {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border-radius: 4px;
+  padding: 2px 6px;
+  background: var(--pill-bg-green);
+  color: var(--pill-on-green);
+}
+.branch-where-remote {
+  font-family: var(--mono);
+  font-weight: 500;
+  background: var(--surface-hover);
+  color: var(--text);
+}
+.branch-upstream {
+  font-family: var(--mono);
+}
+.branch-confirm {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+}
+.branch-confirm-label {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.branch-delete-btn {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--red);
+  flex: none;
+  display: flex;
+  align-items: center;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 5px 9px;
+}
+.branch-delete-btn:hover:not(:disabled) {
+  background: var(--pill-bg-red);
+  border-color: var(--red);
+}
+.branch-delete-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

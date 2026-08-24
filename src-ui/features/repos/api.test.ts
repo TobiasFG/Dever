@@ -5,6 +5,8 @@ vi.mock('@tauri-apps/api/core', () => ({ invoke }));
 
 import {
   addScanRoot,
+  deleteLocalBranch,
+  deleteRemoteBranch,
   getIncludeWorktrees,
   listBranches,
   listScanRoots,
@@ -72,6 +74,25 @@ describe('repos api', () => {
       path: '/code/app',
       name: 'origin/feat',
       isRemote: true,
+    });
+  });
+
+  it('deleteLocalBranch passes path, name and force', async () => {
+    invoke.mockResolvedValue(undefined);
+    await deleteLocalBranch('/code/app', 'feat', true);
+    expect(invoke).toHaveBeenCalledWith('delete_local_branch', {
+      path: '/code/app',
+      name: 'feat',
+      force: true,
+    });
+  });
+
+  it('deleteRemoteBranch passes path and the remote-tracking name', async () => {
+    invoke.mockResolvedValue(undefined);
+    await deleteRemoteBranch('/code/app', 'origin/feat');
+    expect(invoke).toHaveBeenCalledWith('delete_remote_branch', {
+      path: '/code/app',
+      name: 'origin/feat',
     });
   });
 

@@ -34,6 +34,7 @@ export type IconName =
   | 'send'
   | 'sparkles'
   | 'bell'
+  | 'trash'
   | 'close';
 
 type IconProps = {
@@ -199,6 +200,15 @@ const paths: Record<IconName, ReactNode> = {
       <circle cx="5" cy="12" r="1.4" />
       <circle cx="12" cy="12" r="1.4" />
       <circle cx="19" cy="12" r="1.4" />
+    </>
+  ),
+  trash: (
+    <>
+      <path d="M4 7h16" />
+      <path d="M10 4h4" />
+      <path d="M6 7l1 13h10l1-13" />
+      <path d="M10 11v6" />
+      <path d="M14 11v6" />
     </>
   ),
   swap: (

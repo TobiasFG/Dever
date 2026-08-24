@@ -59,6 +59,55 @@ pub fn switch(path: &Path, name: &str, is_remote: bool) -> Result<(), AppError> 
     Ok(())
 }
 
+/// Delete a local branch. `force` maps to `git branch -D` (drops the
+/// merged-check), otherwise `-d` refuses to delete unmerged work.
+pub fn delete_local(path: &Path, name: &str, force: bool) -> Result<(), AppError> {
+    let output = Command::new("git")
+        .arg("-C")
+        .arg(path)
+        .args(["branch", if force { "-D" } else { "-d" }, name])
+        .output()?;
+
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        return Err(AppError::new(format!(
+            "git branch delete {} failed in {}: {}",
+            name,
+            path.display(),
+            stderr.trim()
+        )));
+    }
+
+    Ok(())
+}
+
+/// Delete a branch on its remote. `name` is the remote-tracking short name
+/// (e.g. `origin/feat`); the remote and branch are split from it.
+pub fn delete_remote(path: &Path, name: &str) -> Result<(), AppError> {
+    let (remote, branch) = name
+        .split_once('/')
+        .ok_or_else(|| AppError::new(format!("not a remote branch: {name}")))?;
+
+    let output = Command::new("git")
+        .arg("-C")
+        .arg(path)
+        .args(["push", remote, "--delete", branch])
+        .output()?;
+
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        return Err(AppError::new(format!(
+            "git push {} --delete {} failed in {}: {}",
+            remote,
+            branch,
+            path.display(),
+            stderr.trim()
+        )));
+    }
+
+    Ok(())
+}
+
 /// Pure parser for `for-each-ref` output. Each record is one line of three
 /// NUL-separated fields: the full refname, `*` for the current branch (else
 /// empty), and the upstream short name (else empty). The namespace
@@ -155,5 +204,51 @@ mod tests {
     #[test]
     fn empty_output_is_no_branches() {
         assert!(parse_for_each_ref("").is_empty());
+    }
+
+    /// A repo with one commit on `main` and an extra `feature` branch.
+    fn repo_with_feature_branch() -> tempfile::TempDir {
+        let dir = tempfile::tempdir().unwrap();
+        let git = |args: &[&str]| {
+            let out = Command::new("git")
+                .arg("-C")
+                .arg(dir.path())
+                .args(args)
+                .output()
+                .unwrap();
+            assert!(out.status.success(), "git {args:?}: {:?}", out);
+        };
+        git(&["init", "-b", "main"]);
+        git(&["config", "user.email", "t@example.com"]);
+        git(&["config", "user.name", "T"]);
+        git(&["commit", "--allow-empty", "-m", "init"]);
+        git(&["branch", "feature"]);
+        dir
+    }
+
+    #[test]
+    fn delete_local_removes_a_merged_branch() {
+        let dir = repo_with_feature_branch();
+        delete_local(dir.path(), "feature", false).unwrap();
+        let names: Vec<_> = list(dir.path())
+            .unwrap()
+            .into_iter()
+            .map(|b| b.name)
+            .collect();
+        assert_eq!(names, vec!["main"]);
+    }
+
+    #[test]
+    fn delete_local_refuses_the_current_branch() {
+        let dir = repo_with_feature_branch();
+        let err = delete_local(dir.path(), "main", false).unwrap_err();
+        assert!(format!("{err:?}").contains("main"));
+        assert_eq!(list(dir.path()).unwrap().len(), 2);
+    }
+
+    #[test]
+    fn delete_remote_rejects_a_name_without_a_remote() {
+        let dir = repo_with_feature_branch();
+        assert!(delete_remote(dir.path(), "feature").is_err());
     }
 }

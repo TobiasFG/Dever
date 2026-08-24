@@ -14,6 +14,10 @@ export const pullRepo = (path: string) => call<Repo>('pull_repo', { path });
 export const listBranches = (path: string) => call<Branch[]>('list_branches', { path });
 export const switchBranch = (path: string, name: string, isRemote: boolean) =>
   call<void>('switch_branch', { path, name, isRemote });
+export const deleteLocalBranch = (path: string, name: string, force: boolean) =>
+  call<void>('delete_local_branch', { path, name, force });
+export const deleteRemoteBranch = (path: string, name: string) =>
+  call<void>('delete_remote_branch', { path, name });
 export const listEditors = () => call<Editor[]>('list_editors');
 export const openInEditor = (path: string, editorId: string) =>
   call<void>('open_in_editor', { path, editorId });

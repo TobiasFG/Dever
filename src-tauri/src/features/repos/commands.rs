@@ -112,6 +112,19 @@ pub fn switch_branch(path: String, name: String, is_remote: bool) -> Result<(), 
     branches::switch(Path::new(&path), &name, is_remote)
 }
 
+/// Delete a local branch. `force` drops git's merged-check.
+#[tauri::command]
+pub fn delete_local_branch(path: String, name: String, force: bool) -> Result<(), AppError> {
+    branches::delete_local(Path::new(&path), &name, force)
+}
+
+/// Delete a branch on its remote. `name` is the remote-tracking short name
+/// (e.g. `origin/feat`).
+#[tauri::command]
+pub fn delete_remote_branch(path: String, name: String) -> Result<(), AppError> {
+    branches::delete_remote(Path::new(&path), &name)
+}
+
 /// The code editors detected on this machine.
 #[tauri::command]
 pub fn list_editors() -> Result<Vec<Editor>, AppError> {
